@@ -1,0 +1,53 @@
+/*******************************************************************************
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+
+plugins {
+    `java-library`
+}
+
+val javaVersion: String by project
+val edcScmUrl: String by project
+val edcScmConnection: String by project
+
+buildscript {
+    dependencies {
+        val edcVersion: String by project
+        classpath("org.eclipse.edc.edc-build:org.eclipse.edc.edc-build.gradle.plugin:${edcVersion}")
+    }
+}
+
+allprojects {
+    val edcVersion: String by project
+    val edcGroup: String by project
+    apply(plugin = "${edcGroup}.edc-build")
+    // configure which version of the annotation processor to use. defaults to the same version as the plugin
+    configure<org.eclipse.edc.plugins.autodoc.AutodocExtension> {
+        processorVersion.set(edcVersion)
+        outputDirectory.set(project.layout.buildDirectory.asFile)
+    }
+
+    configure<org.eclipse.edc.plugins.edcbuild.extensions.BuildExtension> {
+        pom {
+            scmUrl.set(edcScmUrl)
+            scmConnection.set(edcScmConnection)
+        }
+    }
+
+}
