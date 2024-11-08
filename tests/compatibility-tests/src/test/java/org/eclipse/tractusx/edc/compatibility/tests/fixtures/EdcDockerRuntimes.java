@@ -17,37 +17,33 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.edc.compatibility.tests.fixtures;
+package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
-import org.eclipse.edc.junit.extensions.ClasspathReader;
-import org.eclipse.edc.junit.extensions.EmbeddedRuntime;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 
-import java.net.URL;
 import java.util.Map;
 
-public enum Runtimes {
+public enum EdcDockerRuntimes {
 
     CONTROL_PLANE(
-            ":runtimes:snapshot:controlplane-snapshot"
-    ),
-    IDENTITY_HUB(
-            ":runtimes:snapshot:identityhub-snapshot"
+            "controlplane-stable:latest"
     ),
     DATA_PLANE(
-            ":runtimes:snapshot:dataplane-snapshot"
+            "dataplane-stable:latest"
     );
 
-    private final String[] modules;
-    private URL[] classpathEntries;
+    private final String image;
 
-    Runtimes(String... modules) {
-        this.modules = modules;
+    EdcDockerRuntimes(String image) {
+        this.image = image;
     }
 
-    public EmbeddedRuntime create(String name, Map<String, String> configuration) {
-        if (classpathEntries == null) {
-            classpathEntries = ClasspathReader.classpathFor(modules);
-        }
-        return new EmbeddedRuntime(name, configuration, classpathEntries);
+    public GenericContainer<?> create(String name, Map<String, String> env) {
+        return new GenericContainer<>(image)
+                .withCreateContainerCmdModifier(cmd -> cmd.withName(name))
+                .withNetworkMode("host")
+                .waitingFor(Wait.forLogMessage(".*Runtime .* ready.*", 1))
+                .withEnv(env);
     }
 }

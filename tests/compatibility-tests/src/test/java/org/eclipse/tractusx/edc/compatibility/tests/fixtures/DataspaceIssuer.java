@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.edc.compatibility.tests.fixtures;
+package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -48,9 +48,9 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static org.eclipse.edc.compatibility.tests.fixtures.DcpHelperFunctions.createVc;
-import static org.eclipse.edc.compatibility.tests.fixtures.DcpHelperFunctions.frameworkAgreementSubject;
-import static org.eclipse.edc.compatibility.tests.fixtures.DcpHelperFunctions.membershipSubject;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.createVc;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.frameworkAgreementSubject;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.membershipSubject;
 import static org.eclipse.edc.jsonld.util.JacksonJsonLd.createObjectMapper;
 import static org.eclipse.edc.util.io.Ports.getFreePort;
 

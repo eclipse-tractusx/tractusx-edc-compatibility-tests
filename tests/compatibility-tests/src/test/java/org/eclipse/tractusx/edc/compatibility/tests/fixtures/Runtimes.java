@@ -17,33 +17,37 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.edc.compatibility.tests.fixtures;
+package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
+import org.eclipse.edc.junit.extensions.ClasspathReader;
+import org.eclipse.edc.junit.extensions.EmbeddedRuntime;
 
+import java.net.URL;
 import java.util.Map;
 
-public enum EdcDockerRuntimes {
+public enum Runtimes {
 
     CONTROL_PLANE(
-            "controlplane-stable:latest"
+            ":runtimes:snapshot:controlplane-snapshot"
+    ),
+    IDENTITY_HUB(
+            ":runtimes:snapshot:identityhub-snapshot"
     ),
     DATA_PLANE(
-            "dataplane-stable:latest"
+            ":runtimes:snapshot:dataplane-snapshot"
     );
 
-    private final String image;
+    private final String[] modules;
+    private URL[] classpathEntries;
 
-    EdcDockerRuntimes(String image) {
-        this.image = image;
+    Runtimes(String... modules) {
+        this.modules = modules;
     }
 
-    public GenericContainer<?> create(String name, Map<String, String> env) {
-        return new GenericContainer<>(image)
-                .withCreateContainerCmdModifier(cmd -> cmd.withName(name))
-                .withNetworkMode("host")
-                .waitingFor(Wait.forLogMessage(".*Runtime .* ready.*", 1))
-                .withEnv(env);
+    public EmbeddedRuntime create(String name, Map<String, String> configuration) {
+        if (classpathEntries == null) {
+            classpathEntries = ClasspathReader.classpathFor(modules);
+        }
+        return new EmbeddedRuntime(name, configuration, classpathEntries);
     }
 }

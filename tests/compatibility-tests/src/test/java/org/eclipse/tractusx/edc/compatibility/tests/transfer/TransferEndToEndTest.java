@@ -17,16 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.edc.compatibility.tests.transfer;
+package org.eclipse.tractusx.edc.compatibility.tests.transfer;
 
 import jakarta.json.JsonObject;
-import org.eclipse.edc.compatibility.tests.fixtures.BaseParticipant;
-import org.eclipse.edc.compatibility.tests.fixtures.DataspaceIssuer;
-import org.eclipse.edc.compatibility.tests.fixtures.EdcDockerRuntimes;
-import org.eclipse.edc.compatibility.tests.fixtures.IdentityHubParticipant;
-import org.eclipse.edc.compatibility.tests.fixtures.LocalParticipant;
-import org.eclipse.edc.compatibility.tests.fixtures.RemoteParticipant;
-import org.eclipse.edc.compatibility.tests.fixtures.Runtimes;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.BaseParticipant;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.DataspaceIssuer;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.EdcDockerRuntimes;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.IdentityHubParticipant;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.LocalParticipant;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.RemoteParticipant;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.Runtimes;
 import org.eclipse.edc.connector.controlplane.test.system.utils.PolicyFixtures;
 import org.eclipse.edc.junit.annotations.EndToEndTest;
 import org.eclipse.edc.junit.extensions.RuntimeExtension;
@@ -60,8 +60,8 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
-import static org.eclipse.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipant;
-import static org.eclipse.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipantContext;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipant;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipantContext;
 import static org.eclipse.edc.connector.controlplane.test.system.utils.PolicyFixtures.noConstraintPolicy;
 import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.STARTED;
 import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.SUSPENDED;

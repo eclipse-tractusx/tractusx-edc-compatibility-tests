@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.edc.compatibility.tests.fixtures;
+package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
 import java.net.URI;
 import java.util.HashMap;
