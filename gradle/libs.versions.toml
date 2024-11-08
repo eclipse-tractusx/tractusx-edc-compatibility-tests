@@ -9,7 +9,7 @@ jackson = "2.18.0"
 restAssured = "5.5.0"
 awaitility = "4.2.2"
 httpMockServer = "5.15.0"
-testcontainers = "1.20.2"
+testcontainers = "1.20.3"
 
 # add here
 
