@@ -5,8 +5,6 @@ format.version = "1.1"
 tractusx = "0.7.7"
 edc = "0.7.2"
 
-# add here
-
 [libraries]
 tx-edc-controlplane-postgresql-hashicorp-vault = { module = "org.eclipse.tractusx.edc:edc-controlplane-postgresql-hashicorp-vault", version.ref = "tractusx" }
 tx-edc-dataplane-postgresql-hashicorp-vault = { module = "org.eclipse.tractusx.edc:edc-dataplane-hashicorp-vault", version.ref = "tractusx" }
