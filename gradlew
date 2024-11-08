@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ################################################################################
-# Copyright (c) 2024 Contributors to the Eclipse Foundation
+# Copyright (c) 2024 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
