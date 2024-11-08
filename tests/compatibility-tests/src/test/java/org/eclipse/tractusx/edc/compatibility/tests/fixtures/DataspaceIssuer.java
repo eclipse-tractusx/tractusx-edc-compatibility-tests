@@ -48,11 +48,11 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static org.eclipse.edc.jsonld.util.JacksonJsonLd.createObjectMapper;
+import static org.eclipse.edc.util.io.Ports.getFreePort;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.createVc;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.frameworkAgreementSubject;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.membershipSubject;
-import static org.eclipse.edc.jsonld.util.JacksonJsonLd.createObjectMapper;
-import static org.eclipse.edc.util.io.Ports.getFreePort;
 
 /**
  * Dataspace issuer configurations

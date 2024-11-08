@@ -20,13 +20,6 @@
 package org.eclipse.tractusx.edc.compatibility.tests.transfer;
 
 import jakarta.json.JsonObject;
-import org.eclipse.tractusx.edc.compatibility.tests.fixtures.BaseParticipant;
-import org.eclipse.tractusx.edc.compatibility.tests.fixtures.DataspaceIssuer;
-import org.eclipse.tractusx.edc.compatibility.tests.fixtures.EdcDockerRuntimes;
-import org.eclipse.tractusx.edc.compatibility.tests.fixtures.IdentityHubParticipant;
-import org.eclipse.tractusx.edc.compatibility.tests.fixtures.LocalParticipant;
-import org.eclipse.tractusx.edc.compatibility.tests.fixtures.RemoteParticipant;
-import org.eclipse.tractusx.edc.compatibility.tests.fixtures.Runtimes;
 import org.eclipse.edc.connector.controlplane.test.system.utils.PolicyFixtures;
 import org.eclipse.edc.junit.annotations.EndToEndTest;
 import org.eclipse.edc.junit.extensions.RuntimeExtension;
@@ -34,6 +27,13 @@ import org.eclipse.edc.junit.extensions.RuntimePerClassExtension;
 import org.eclipse.edc.spi.iam.AudienceResolver;
 import org.eclipse.edc.spi.result.Result;
 import org.eclipse.edc.spi.security.Vault;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.BaseParticipant;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.DataspaceIssuer;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.EdcDockerRuntimes;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.IdentityHubParticipant;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.LocalParticipant;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.RemoteParticipant;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.Runtimes;
 import org.eclipse.tractusx.edc.spi.identity.mapper.BdrsClient;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
@@ -60,14 +60,14 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
-import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipant;
-import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipantContext;
 import static org.eclipse.edc.connector.controlplane.test.system.utils.PolicyFixtures.noConstraintPolicy;
 import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.STARTED;
 import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.SUSPENDED;
 import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
 import static org.eclipse.edc.sql.testfixtures.PostgresqlEndToEndInstance.createDatabase;
 import static org.eclipse.edc.util.io.Ports.getFreePort;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipant;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipantContext;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 
@@ -79,7 +79,7 @@ public class TransferEndToEndTest {
             .name("identity-hub")
             .id("identity-hub")
             .build();
-
+    
     protected static final DataspaceIssuer ISSUER = DataspaceIssuer.Builder.newInstance().id("issuer").name("issuer")
             .did(IDENTITY_HUB_PARTICIPANT.didFor("issuer"))
             .build();
