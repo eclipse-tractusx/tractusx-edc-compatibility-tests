@@ -23,6 +23,14 @@ plugins {
 
 dependencies {
     testImplementation(libs.edc.junit)
+    testImplementation(libs.edc.lib.cryptocommon)
+    testImplementation(libs.edc.lib.jws2020)
+    testImplementation(libs.edc.sql.transactionlocal)
+    testImplementation(libs.edc.sts.spi)
+    testImplementation(libs.edc.ih.spi.did)
+    testImplementation(libs.edc.ih.spi.credentials)
+    testImplementation(libs.edc.ih.spi.participant.context)
+    testImplementation(libs.edc.ih.spi.store)
     testImplementation(libs.tx.bdrs.client.spi)
     testImplementation(libs.jakarta.json.api)
     testImplementation(libs.jackson.datatype.jakarta.jsonp)
@@ -33,14 +41,5 @@ dependencies {
     testImplementation(libs.testcontainers.junit)
     testImplementation(libs.testcontainers.postgres)
     testImplementation(testFixtures(libs.edc.api.management.test.fixtures))
-    testImplementation(testFixtures(libs.edc.sql.core))
-    testImplementation(libs.edc.ih.spi.participant.context)
-    testImplementation(libs.edc.lib.cryptocommon)
-    testImplementation(libs.edc.sts.spi)
-    testImplementation(libs.edc.ih.spi.did)
-    testImplementation(libs.edc.ih.spi.credentials)
-    testImplementation(libs.edc.lib.jws2020)
-    testImplementation(libs.edc.ih.spi.store)
-    testImplementation(libs.edc.sql.transactionlocal)
-
+    testImplementation(testFixtures(libs.edc.sql.test.fixtures))
 }

@@ -2,8 +2,8 @@
 format.version = "1.1"
 
 [versions]
-tractusx = "0.7.7"
-edc = "0.7.2"
+tractusx = "0.8.0"
+edc = "0.10.1"
 
 [libraries]
 tx-edc-controlplane-postgresql-hashicorp-vault = { module = "org.eclipse.tractusx.edc:edc-controlplane-postgresql-hashicorp-vault", version.ref = "tractusx" }
@@ -16,5 +16,5 @@ edc-auth-oauth2-client = { module = "org.eclipse.edc:oauth2-client", version.ref
 edc-api-management-dataplaneselector = { module = "org.eclipse.edc:data-plane-selector-api", version.ref = "edc" }
 
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
+shadow = { id = "com.gradleup.shadow", version = "8.3.5" }
 docker = { id = "com.bmuschko.docker-remote-api", version = "9.4.0" }
