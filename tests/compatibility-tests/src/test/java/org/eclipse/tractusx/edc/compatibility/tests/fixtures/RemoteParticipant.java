@@ -21,6 +21,7 @@ package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.eclipse.edc.util.io.Ports.getFreePort;
@@ -28,6 +29,10 @@ import static org.eclipse.edc.util.io.Ports.getFreePort;
 public class RemoteParticipant extends BaseParticipant {
 
     private static final String API_KEY = "password";
+
+    private final List<String> datasources = List.of("asset", "contractdefinition",
+            "contractnegotiation", "policy", "transferprocess", "bpn",
+            "policy-monitor", "edr", "dataplane", "accesstokendata", "dataplaneinstance");
 
     public Map<String, String> controlPlaneEnv(BaseParticipant participant) {
         return new HashMap<>() {
@@ -109,11 +114,12 @@ public class RemoteParticipant extends BaseParticipant {
 
     private Map<String, String> datasourceConfig() {
         var config = new HashMap<String, String>();
-
-        config.put("EDC_DATASOURCE_DEFAULT_URL", "jdbc:postgresql://localhost:5432/" + getName());
-        config.put("EDC_DATASOURCE_DEFAULT_USER", "postgres");
-        config.put("EDC_DATASOURCE_DEFAULT_PASSWORD", "password");
-
+        datasources.forEach(ds -> {
+            config.put("EDC_DATASOURCE_" + ds.toUpperCase() + "_URL", "jdbc:postgresql://localhost:5432/" + getName());
+            config.put("EDC_DATASOURCE_" + ds.toUpperCase() + "_NAME", ds);
+            config.put("EDC_DATASOURCE_" + ds.toUpperCase() + "_USER", "postgres");
+            config.put("EDC_DATASOURCE_" + ds.toUpperCase() + "_PASSWORD", "password");
+        });
         return config;
     }
 
