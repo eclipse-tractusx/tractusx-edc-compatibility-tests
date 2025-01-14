@@ -74,7 +74,6 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 @EndToEndTest
 public class TransferEndToEndTest {
 
-
     protected static final IdentityHubParticipant IDENTITY_HUB_PARTICIPANT = IdentityHubParticipant.Builder.newInstance()
             .name("identity-hub")
             .id("identity-hub")
@@ -154,15 +153,6 @@ public class TransferEndToEndTest {
 
         var cpVault = LOCAL_CONTROL_PLANE.getService(Vault.class);
         cpVault.storeSecret("local-secret", "clientSecret");
-    }
-
-    private static @NotNull Map<String, Object> httpSourceDataAddress() {
-        return Map.of(
-                EDC_NAMESPACE + "name", "transfer-test",
-                EDC_NAMESPACE + "baseUrl", "http://localhost:" + providerDataSource.getPort() + "/source",
-                EDC_NAMESPACE + "type", "HttpData",
-                EDC_NAMESPACE + "proxyQueryParams", "true"
-        );
     }
 
     @ParameterizedTest
@@ -251,15 +241,23 @@ public class TransferEndToEndTest {
         provider.createContractDefinition(assetId, UUID.randomUUID().toString(), noConstraintPolicyId, contractPolicyId);
     }
 
+    private @NotNull Map<String, Object> httpSourceDataAddress() {
+        return Map.of(
+                EDC_NAMESPACE + "name", "transfer-test",
+                EDC_NAMESPACE + "baseUrl", "http://localhost:" + providerDataSource.getPort() + "/source",
+                EDC_NAMESPACE + "type", "HttpData",
+                EDC_NAMESPACE + "proxyQueryParams", "true"
+        );
+    }
+
     private static class ParticipantsArgProvider implements ArgumentsProvider {
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
             return Stream.of(
                     Arguments.of(REMOTE_PARTICIPANT, LOCAL_PARTICIPANT, "dataspace-protocol-http"),
                     Arguments.of(LOCAL_PARTICIPANT, REMOTE_PARTICIPANT, "dataspace-protocol-http")
             );
         }
     }
-
 
 }

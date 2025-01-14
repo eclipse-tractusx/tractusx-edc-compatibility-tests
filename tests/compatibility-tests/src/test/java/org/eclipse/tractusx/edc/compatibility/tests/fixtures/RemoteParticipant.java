@@ -49,6 +49,8 @@ public class RemoteParticipant extends BaseParticipant {
                 put("WEB_HTTP_VERSION_PATH", controlPlaneVersion.getPath());
                 put("WEB_HTTP_CONTROL_PORT", String.valueOf(controlPlaneControl.getPort()));
                 put("WEB_HTTP_CONTROL_PATH", controlPlaneControl.getPath());
+                put("WEB_HTTP_CATALOG_PORT", String.valueOf(getFreePort()));
+                put("WEB_HTTP_CATALOG_PATH", "/catalog");
                 put("EDC_DSP_CALLBACK_ADDRESS", protocolEndpoint.getUrl().toString());
                 put("EDC_DATASOURCE_DEFAULT_URL", "jdbc:postgresql://localhost:5432/%s".formatted(getId()));
                 put("EDC_DATASOURCE_DEFAULT_USER", "postgres");
@@ -111,7 +113,6 @@ public class RemoteParticipant extends BaseParticipant {
     }
 
     private Map<String, String> datasourceConfig() {
-
         var config = new HashMap<String, String>();
         datasources.forEach(ds -> {
             config.put("EDC_DATASOURCE_" + ds.toUpperCase() + "_URL", "jdbc:postgresql://localhost:5432/" + getName());
