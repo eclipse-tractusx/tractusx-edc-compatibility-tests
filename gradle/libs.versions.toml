@@ -50,5 +50,5 @@ edc-bom-identithub-sts = { module = "org.eclipse.edc:identityhub-with-sts-bom", 
 
 
 [plugins]
-shadow = { id = "com.gradleup.shadow", version = "8.3.5" }
+shadow = { id = "com.gradleup.shadow", version = "8.3.6" }
 docker = { id = "com.bmuschko.docker-remote-api", version = "9.4.0" }
