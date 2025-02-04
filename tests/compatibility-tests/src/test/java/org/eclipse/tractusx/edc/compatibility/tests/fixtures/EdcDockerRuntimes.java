@@ -21,31 +21,32 @@ package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.yaml.snakeyaml.util.Tuple;
 
 import java.util.Map;
 
 public enum EdcDockerRuntimes {
 
-    CONTROL_PLANE(
-            "controlplane-stable:latest"
-    ),
-    DATA_PLANE(
-            "dataplane-stable:latest"
-    );
+    STABLE_CONNECTOR_0_7_6("controlplane-076:latest", "dataplane-076:latest"),
+    STABLE_CONNECTOR("controlplane-stable:latest", "dataplane-stable:latest");
 
-    private final String image;
 
-    EdcDockerRuntimes(String image) {
-        this.image = image;
+    private final String controlPlaneImage;
+    private final String dataPlaneImage;
+
+
+    EdcDockerRuntimes(String controlPlaneImage, String dataPlaneImage) {
+        this.controlPlaneImage = controlPlaneImage;
+        this.dataPlaneImage = dataPlaneImage;
     }
 
-    public GenericContainer<?> create(String name, Map<String, String> env) {
-        return new GenericContainer<>(image)
-                .withCreateContainerCmdModifier(cmd -> cmd.withName(name))
-                .withNetworkMode("host")
-                .withLogConsumer(it -> System.out.println("[%s] %s".formatted(name, it.getUtf8StringWithoutLineEnding())))
-                .waitingFor(Wait.forLogMessage(".*Runtime .* ready.*", 1))
-                .withEnv(env);
+    public Tuple<GenericContainer<?>, GenericContainer<?>> start(Map<String, String> controlPlaneEnv, Map<String, String> dataPlaneEnv) {
+        var controlPlane =
+                new GenericContainer<>(controlPlaneImage).withCreateContainerCmdModifier(cmd -> cmd.withName(this.name() + "-controlplane")).withNetworkMode("host").waitingFor(Wait.forLogMessage(".*Runtime .* ready.*", 1)).withEnv(controlPlaneEnv);
+        var dataPlane = new GenericContainer<>(dataPlaneImage).withCreateContainerCmdModifier(cmd -> cmd.withName(this.name() + "-dataplane")).withNetworkMode("host").waitingFor(Wait.forLogMessage(".*Runtime .* ready.*", 1)).withEnv(dataPlaneEnv);
+        controlPlane.start();
+        dataPlane.start();
+        return new Tuple<>(controlPlane, dataPlane);
     }
 
 }

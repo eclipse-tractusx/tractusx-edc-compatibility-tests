@@ -21,6 +21,10 @@ package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
 import com.nimbusds.jose.jwk.JWK;
 import io.restassured.common.mapper.TypeRef;
+import io.restassured.http.ContentType;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import org.assertj.core.api.ThrowingConsumer;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.edc.connector.controlplane.test.system.utils.Participant;
@@ -36,6 +40,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -142,6 +147,7 @@ public abstract class BaseParticipant extends Participant {
      * Get the EDR from the EDR cache by transfer process id.
      *
      * @param transferProcessId The transfer process id
+     *
      * @return The cached {@link DataAddress}
      */
     public DataAddress getEdr(String transferProcessId) {
@@ -168,6 +174,20 @@ public abstract class BaseParticipant extends Participant {
                 () -> getTransferProcessState(transferProcessId),
                 it -> Objects.equals(it, state.name())
         );
+    }
+
+    public void deprovisionTransfer(String transferProcessId) {
+        JsonObjectBuilder requestBodyBuilder = Json.createObjectBuilder().add("@context", Json.createObjectBuilder().add("@vocab", "https://w3id.org/edc/v0.0.1/ns/")).add("@type", "DeprovisionTransfer").add("reason", "any reason");
+        managementEndpoint.baseRequest().contentType(ContentType.JSON).body(requestBodyBuilder.build()).when().post("/v3/transferprocesses/{id}/deprovision", new Object[] {transferProcessId}).then().log().ifError().statusCode(204);
+    }
+
+    public String createResource(Map<String, Object> dataAddress, JsonObject policy) {
+        String assetId = UUID.randomUUID().toString();
+        this.createAsset(assetId, Map.of("description", "description"), dataAddress);
+        var contractPolicyId = this.createPolicyDefinition(policy);
+        var noConstraintPolicyId = this.createPolicyDefinition(policy);
+        this.createContractDefinition(assetId, UUID.randomUUID().toString(), noConstraintPolicyId, contractPolicyId);
+        return assetId;
     }
 
     public static class Builder<P extends BaseParticipant, B extends Participant.Builder<P, B>> extends Participant.Builder<P, B> {
