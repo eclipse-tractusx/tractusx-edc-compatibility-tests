@@ -161,7 +161,6 @@ public class TransferEndToEndTest extends AbstractTest {
         providerDataSource.verify(HttpRequest.request("/source").withMethod("GET"));
     }
 
-
     @ParameterizedTest
     @ArgumentsSource(ParticipantsArgProvider.class)
     void httpPull_dataTransfer_withCallbacks(BaseParticipant consumer, BaseParticipant provider, String protocol) {
@@ -189,7 +188,6 @@ public class TransferEndToEndTest extends AbstractTest {
 
         providerDataSource.verify(request("/source").withMethod("GET"));
     }
-
 
     private HttpResponse cacheEdr(HttpRequest request, Map<String, TransferProcessStarted> events) {
 
