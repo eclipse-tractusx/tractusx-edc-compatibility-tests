@@ -34,8 +34,9 @@ public class RemoteParticipant extends BaseParticipant {
             "contractnegotiation", "policy", "transferprocess", "bpn",
             "policy-monitor", "edr", "dataplane", "accesstokendata", "dataplaneinstance");
 
-    public Map<String, String> controlPlaneEnv(BaseParticipant participant) {
-        return new HashMap<>() {
+    public Map<String, String> controlPlaneEnv(List<BaseParticipant> participants) {
+
+        Map<String, String> env = new HashMap<>() {
             {
                 put("EDC_PARTICIPANT_ID", id);
                 put("EDC_API_AUTH_KEY", API_KEY);
@@ -62,18 +63,24 @@ public class RemoteParticipant extends BaseParticipant {
                 put("TESTING_EDC_VAULTS_1_VALUE", "clientSecret");
                 put("EDC_IAM_ISSUER_ID", getDid());
                 put("EDC_IAM_DID_WEB_USE_HTTPS", "false");
-                put("TESTING_EDC_BDRS_1_KEY", participant.getId());
-                put("TESTING_EDC_BDRS_1_VALUE", participant.getDid());
                 put("EDC_IAM_TRUSTED-ISSUER_ISSUER_ID", trustedIssuer);
                 putAll(datasourceConfig());
             }
         };
+        addBdrsEnvs(env, participants);
+        return env;
     }
 
-    public Map<String, String> dataPlaneEnv(BaseParticipant participant) {
+    private void addBdrsEnvs(Map<String, String> env, List<BaseParticipant> participants) {
+        for (int i = 0; i < participants.size(); i++) {
+            env.put("TESTING_EDC_BDRS_" + (i + 1) + "_KEY", participants.get(i).getId());
+            env.put("TESTING_EDC_BDRS_" + (i + 1) + "_VALUE", participants.get(i).getDid());
+        }
+    }
 
 
-        return new HashMap<>() {
+    public Map<String, String> dataPlaneEnv(List<BaseParticipant> participant) {
+        Map<String, String> envs = new HashMap<>() {
             {
                 put("EDC_PARTICIPANT_ID", id);
                 put("EDC_COMPONENT_ID", id);
@@ -102,14 +109,14 @@ public class RemoteParticipant extends BaseParticipant {
                 put("TESTING_EDC_VAULTS_2_VALUE", getPrivateKeyAsString());
                 put("TESTING_EDC_VAULTS_3_KEY", "public-key");
                 put("TESTING_EDC_VAULTS_3_VALUE", getPublicKeyAsString());
-                put("TESTING_EDC_BDRS_1_KEY", participant.getId());
-                put("TESTING_EDC_BDRS_1_VALUE", participant.getDid());
                 put("EDC_IAM_ISSUER_ID", getDid());
                 put("EDC_IAM_TRUSTED-ISSUER_ISSUER_ID", trustedIssuer);
 
                 putAll(datasourceConfig());
             }
         };
+        addBdrsEnvs(envs, participant);
+        return envs;
     }
 
     private Map<String, String> datasourceConfig() {

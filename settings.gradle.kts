@@ -43,6 +43,9 @@ dependencyResolutionManagement {
         create("stableLibs") {
             from(files("./gradle/libs.stable.versions.toml"))
         }
+        create("libs076") {
+            from(files("./gradle/libs.0.7.6.versions.toml"))
+        }
     }
 }
 
@@ -53,4 +56,7 @@ include(":runtimes:snapshot:dataplane-snapshot")
 include(":runtimes:stable:controlplane-stable")
 include(":runtimes:stable:dataplane-stable")
 include(":runtimes:stable:extensions")
+include(":runtimes:076:controlplane-076")
+include(":runtimes:076:dataplane-076")
+include(":runtimes:076:stable:extensions-076")
 include(":tests:compatibility-tests")
