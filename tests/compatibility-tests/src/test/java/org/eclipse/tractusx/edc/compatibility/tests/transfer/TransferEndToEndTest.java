@@ -194,6 +194,21 @@ public class TransferEndToEndTest {
 
     @ParameterizedTest
     @ArgumentsSource(ParticipantsArgProvider.class)
+    void extractCatalogFromProvider(BaseParticipant consumer, BaseParticipant provider, String protocol) {
+        consumer.setProtocol(protocol);
+        provider.setProtocol(protocol);
+        provider.waitForDataPlane();
+        providerDataSource.when(HttpRequest.request()).respond(HttpResponse.response().withBody("data"));
+        var assetId = UUID.randomUUID().toString();
+        createResourcesOnProvider(provider, assetId, PolicyFixtures.noConstraintPolicy(), httpSourceDataAddress());
+
+        var catalog = consumer.getCatalogDatasets(provider);
+
+        System.out.println(catalog.toString());
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(ParticipantsArgProvider.class)
     void suspendAndResume_httpPull_dataTransfer(BaseParticipant consumer, BaseParticipant provider, String protocol) {
         consumer.setProtocol(protocol);
         provider.setProtocol(protocol);
