@@ -23,8 +23,8 @@ import com.nimbusds.jose.jwk.JWK;
 import io.restassured.common.mapper.TypeRef;
 import org.assertj.core.api.ThrowingConsumer;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.eclipse.edc.connector.controlplane.test.system.utils.LazySupplier;
 import org.eclipse.edc.connector.controlplane.test.system.utils.Participant;
-import org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates;
 import org.eclipse.edc.security.token.jwt.CryptoConverter;
 import org.eclipse.edc.spi.types.domain.DataAddress;
 
@@ -35,7 +35,6 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Map;
-import java.util.Objects;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -45,25 +44,21 @@ import static org.eclipse.edc.util.io.Ports.getFreePort;
 
 public abstract class BaseParticipant extends Participant {
 
-
-    protected final URI controlPlaneDefault = URI.create("http://localhost:" + getFreePort());
-    protected final URI controlPlaneControl = URI.create("http://localhost:" + getFreePort() + "/control");
-    protected final URI dataPlaneDefault = URI.create("http://localhost:" + getFreePort());
-    protected final URI dataPlaneControl = URI.create("http://localhost:" + getFreePort() + "/control");
-    protected final URI dataPlanePublic = URI.create("http://localhost:" + getFreePort() + "/public");
-    protected final URI consumerPublic = URI.create("http://localhost:" + getFreePort() + "/public");
-    protected final URI controlPlaneVersion = URI.create("http://localhost:" + getFreePort() + "/version");
-    protected final URI dataPlaneVersion = URI.create("http://localhost:" + getFreePort() + "/version");
+    protected final LazySupplier<URI> controlPlaneControl = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/control"));
+    protected final LazySupplier<URI> dataPlaneControl = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/control"));
+    protected final LazySupplier<URI> dataPlanePublic = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/public"));
+    protected final LazySupplier<URI> consumerPublic = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/public"));
+    protected final LazySupplier<URI> controlPlaneVersion = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/version"));
+    protected final LazySupplier<URI> dataPlaneVersion = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/version"));
     protected URI sts;
     protected KeyPair keyPair;
     protected JWK keyPairJwk;
     protected String did;
     protected String trustedIssuer;
 
-
     public static KeyPair generateKeyPair() {
         try {
-            KeyPairGenerator gen = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
+            var gen = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
             gen.initialize(new ECGenParameterSpec("secp256r1"));
             return gen.generateKeyPair();
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
@@ -125,7 +120,7 @@ public abstract class BaseParticipant extends Participant {
     public void waitForDataPlane() {
         await().atMost(timeout)
                 .untilAsserted(() -> {
-                    var jp = managementEndpoint.baseRequest()
+                    var jp = baseManagementRequest()
                             .get("/v3/dataplanes")
                             .then()
                             .statusCode(200)
@@ -145,7 +140,7 @@ public abstract class BaseParticipant extends Participant {
      * @return The cached {@link DataAddress}
      */
     public DataAddress getEdr(String transferProcessId) {
-        var dataAddressRaw = managementEndpoint.baseRequest()
+        var dataAddressRaw = baseManagementRequest()
                 .contentType(JSON)
                 .when()
                 .get("/v2/edrs/{id}/dataaddress", transferProcessId)
@@ -163,19 +158,11 @@ public abstract class BaseParticipant extends Participant {
 
     }
 
-    public void awaitTransferToBeInState(String transferProcessId, TransferProcessStates state) {
-        await().atMost(timeout).until(
-                () -> getTransferProcessState(transferProcessId),
-                it -> Objects.equals(it, state.name())
-        );
-    }
-
     public static class Builder<P extends BaseParticipant, B extends Participant.Builder<P, B>> extends Participant.Builder<P, B> {
 
         protected Builder(P participant) {
             super(participant);
         }
-
 
         public B sts(URI sts) {
             participant.sts = sts;
@@ -193,7 +180,7 @@ public abstract class BaseParticipant extends Participant {
         }
 
         @Override
-        public Participant build() {
+        public P build() {
             super.build();
 
             if (participant.did == null) {

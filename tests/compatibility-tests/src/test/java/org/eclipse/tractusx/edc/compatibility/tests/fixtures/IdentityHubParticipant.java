@@ -19,6 +19,10 @@
 
 package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
+import org.eclipse.edc.connector.controlplane.test.system.utils.LazySupplier;
+import org.eclipse.edc.spi.system.configuration.Config;
+import org.eclipse.edc.spi.system.configuration.ConfigFactory;
+
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -30,37 +34,34 @@ import static org.eclipse.edc.util.io.Ports.getFreePort;
 
 public class IdentityHubParticipant {
 
-    protected final URI defaultApi = URI.create("http://localhost:" + getFreePort() + "/api");
-
-
-    protected final URI sts = URI.create("http://localhost:" + getFreePort() + "/api/sts");
-    protected final URI accountsApi = URI.create("http://localhost:" + getFreePort() + "/api/accounts");
-    protected final URI resolutionApi = URI.create("http://localhost:" + getFreePort() + "/api/resolution");
-    protected final URI identityApi = URI.create("http://localhost:" + getFreePort() + "/api/identity");
-    protected final URI didApi = URI.create("http://localhost:" + getFreePort() + "/");
+    protected final LazySupplier<URI> sts = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/api/sts"));
+    protected final LazySupplier<URI> accountsApi = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/api/accounts"));
+    protected final LazySupplier<URI> resolutionApi = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/api/resolution"));
+    protected final LazySupplier<URI> identityApi = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/api/identity"));
+    protected final LazySupplier<URI> didApi = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/"));
     protected String id;
     protected String name;
 
+    public Config getConfig() {
+        Map<String, String> settings = new HashMap<>();
 
-    public Map<String, String> getConfiguration() {
-        Map<String, String> config = new HashMap<>();
-        config.put("web.http.port", String.valueOf(defaultApi.getPort()));
-        config.put("web.http.path", defaultApi.getPath());
-        config.put("web.http.presentation.port", String.valueOf(resolutionApi.getPort()));
-        config.put("web.http.presentation.path", resolutionApi.getPath());
-        config.put("web.http.identity.port", String.valueOf(identityApi.getPort()));
-        config.put("web.http.identity.path", identityApi.getPath());
-        config.put("web.http.sts.port", String.valueOf(sts.getPort()));
-        config.put("web.http.sts.path", sts.getPath());
-        config.put("web.http.accounts.port", String.valueOf(accountsApi.getPort()));
-        config.put("web.http.accounts.path", accountsApi.getPath());
-        config.put("web.http.did.port", String.valueOf(didApi.getPort()));
-        config.put("web.http.did.path", didApi.getPath());
-        config.put("edc.iam.did.web.use.https", "false");
-        config.put("edc.api.accounts.key", "password");
-        return config;
+        settings.put("web.http.port", String.valueOf(getFreePort()));
+        settings.put("web.http.path", "/api");
+        settings.put("web.http.presentation.port", String.valueOf(resolutionApi.get().getPort()));
+        settings.put("web.http.presentation.path", resolutionApi.get().getPath());
+        settings.put("web.http.identity.port", String.valueOf(identityApi.get().getPort()));
+        settings.put("web.http.identity.path", identityApi.get().getPath());
+        settings.put("web.http.sts.port", String.valueOf(sts.get().getPort()));
+        settings.put("web.http.sts.path", sts.get().getPath());
+        settings.put("web.http.accounts.port", String.valueOf(accountsApi.get().getPort()));
+        settings.put("web.http.accounts.path", accountsApi.get().getPath());
+        settings.put("web.http.did.port", String.valueOf(didApi.get().getPort()));
+        settings.put("web.http.did.path", didApi.get().getPath());
+        settings.put("edc.iam.did.web.use.https", "false");
+        settings.put("edc.api.accounts.key", "password");
+
+        return ConfigFactory.fromMap(settings);
     }
-
 
     public String getId() {
         return id;
@@ -71,15 +72,16 @@ public class IdentityHubParticipant {
     }
 
     public URI getSts() {
-        return sts;
+        return sts.get();
     }
 
     public URI getResolutionApi() {
-        return resolutionApi;
+        return resolutionApi.get();
     }
 
     public String didFor(String participantId) {
-        return "did:web:" + URLEncoder.encode(didApi.getHost() + ":" + didApi.getPort(), StandardCharsets.UTF_8) + ":" + participantId;
+        var didUri = didApi.get();
+        return "did:web:" + URLEncoder.encode(didUri.getHost() + ":" + didUri.getPort(), StandardCharsets.UTF_8) + ":" + participantId;
     }
 
     public static class Builder {

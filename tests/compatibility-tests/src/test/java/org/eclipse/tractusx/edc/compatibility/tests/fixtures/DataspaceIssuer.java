@@ -27,7 +27,6 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.json.Json;
@@ -38,9 +37,7 @@ import org.eclipse.edc.iam.verifiablecredentials.spi.model.Issuer;
 import org.eclipse.edc.iam.verifiablecredentials.spi.model.VerifiableCredential;
 import org.eclipse.edc.iam.verifiablecredentials.spi.model.VerifiableCredentialContainer;
 import org.eclipse.edc.identityhub.spi.verifiablecredentials.model.VerifiableCredentialResource;
-import org.eclipse.edc.security.signature.jws2020.JsonWebKeyPair;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +46,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import static org.eclipse.edc.jsonld.util.JacksonJsonLd.createObjectMapper;
-import static org.eclipse.edc.util.io.Ports.getFreePort;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.createVc;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.frameworkAgreementSubject;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.membershipSubject;
@@ -83,7 +79,7 @@ public class DataspaceIssuer extends BaseParticipant {
                 .issuerId(getDid())
                 .participantId(did)
                 .holderId(bpn)
-                .credential(new VerifiableCredentialContainer(rawVc, CredentialFormat.JWT, credential))
+                .credential(new VerifiableCredentialContainer(rawVc, CredentialFormat.VC1_0_JWT, credential))
                 .build();
 
     }
@@ -170,11 +166,6 @@ public class DataspaceIssuer extends BaseParticipant {
         }
     }
 
-    private com.apicatalog.ld.signature.key.KeyPair createKeyPair(JWK jwk, String id) {
-        var type = URI.create("https://w3id.org/security#JsonWebKey2020");
-        return new JsonWebKeyPair(URI.create(id), type, null, jwk);
-    }
-
     public static class Builder extends BaseParticipant.Builder<DataspaceIssuer, Builder> {
 
         protected Builder() {
@@ -183,14 +174,6 @@ public class DataspaceIssuer extends BaseParticipant {
 
         public static Builder newInstance() {
             return new Builder();
-        }
-
-        @Override
-        public DataspaceIssuer build() {
-            super.managementEndpoint(new Endpoint(URI.create("http://localhost:" + getFreePort() + "/api/management"), Map.of()));
-            super.protocolEndpoint(new Endpoint(URI.create("http://localhost:" + getFreePort() + "/protocol")));
-            super.build();
-            return participant;
         }
 
     }
