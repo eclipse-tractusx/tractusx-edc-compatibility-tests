@@ -43,3 +43,7 @@ dependencies {
     testImplementation(testFixtures(libs.edc.api.management.test.fixtures))
     testImplementation(testFixtures(libs.edc.sql.test.fixtures))
 }
+
+test {
+    testLogging.showStandardStreams = true
+}
