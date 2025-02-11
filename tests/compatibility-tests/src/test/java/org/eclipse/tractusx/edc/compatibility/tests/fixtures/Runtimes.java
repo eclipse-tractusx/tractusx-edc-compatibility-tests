@@ -23,19 +23,12 @@ import org.eclipse.edc.junit.extensions.ClasspathReader;
 import org.eclipse.edc.junit.extensions.EmbeddedRuntime;
 
 import java.net.URL;
-import java.util.Map;
 
 public enum Runtimes {
 
-    CONTROL_PLANE(
-            ":runtimes:snapshot:controlplane-snapshot"
-    ),
-    IDENTITY_HUB(
-            ":runtimes:snapshot:identityhub-snapshot"
-    ),
-    DATA_PLANE(
-            ":runtimes:snapshot:dataplane-snapshot"
-    );
+    CONTROL_PLANE(":runtimes:snapshot:controlplane-snapshot"),
+    IDENTITY_HUB(":runtimes:snapshot:identityhub-snapshot"),
+    DATA_PLANE(":runtimes:snapshot:dataplane-snapshot");
 
     private final String[] modules;
     private URL[] classpathEntries;
@@ -44,10 +37,11 @@ public enum Runtimes {
         this.modules = modules;
     }
 
-    public EmbeddedRuntime create(String name, Map<String, String> configuration) {
+    public EmbeddedRuntime create(String name) {
         if (classpathEntries == null) {
             classpathEntries = ClasspathReader.classpathFor(modules);
         }
-        return new EmbeddedRuntime(name, configuration, classpathEntries);
+        return new EmbeddedRuntime(name, classpathEntries);
     }
+
 }

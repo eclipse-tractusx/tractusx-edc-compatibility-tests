@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,19 +38,19 @@ public class RemoteParticipant extends BaseParticipant {
             {
                 put("EDC_PARTICIPANT_ID", id);
                 put("EDC_API_AUTH_KEY", API_KEY);
-                put("WEB_HTTP_PORT", String.valueOf(controlPlaneDefault.getPort()));
+                put("WEB_HTTP_PORT", String.valueOf(getFreePort()));
                 put("WEB_HTTP_PATH", "/api");
-                put("WEB_HTTP_PROTOCOL_PORT", String.valueOf(protocolEndpoint.getUrl().getPort()));
-                put("WEB_HTTP_PROTOCOL_PATH", protocolEndpoint.getUrl().getPath());
-                put("WEB_HTTP_MANAGEMENT_PORT", String.valueOf(managementEndpoint.getUrl().getPort()));
-                put("WEB_HTTP_MANAGEMENT_PATH", managementEndpoint.getUrl().getPath());
-                put("WEB_HTTP_VERSION_PORT", String.valueOf(controlPlaneVersion.getPort()));
-                put("WEB_HTTP_VERSION_PATH", controlPlaneVersion.getPath());
-                put("WEB_HTTP_CONTROL_PORT", String.valueOf(controlPlaneControl.getPort()));
-                put("WEB_HTTP_CONTROL_PATH", controlPlaneControl.getPath());
+                put("WEB_HTTP_PROTOCOL_PORT", String.valueOf(controlPlaneProtocol.get().getPort()));
+                put("WEB_HTTP_PROTOCOL_PATH", controlPlaneProtocol.get().getPath());
+                put("WEB_HTTP_MANAGEMENT_PORT", String.valueOf(controlPlaneManagement.get().getPort()));
+                put("WEB_HTTP_MANAGEMENT_PATH", controlPlaneManagement.get().getPath());
+                put("WEB_HTTP_VERSION_PORT", String.valueOf(controlPlaneVersion.get().getPort()));
+                put("WEB_HTTP_VERSION_PATH", controlPlaneVersion.get().getPath());
+                put("WEB_HTTP_CONTROL_PORT", String.valueOf(controlPlaneControl.get().getPort()));
+                put("WEB_HTTP_CONTROL_PATH", controlPlaneControl.get().getPath());
                 put("WEB_HTTP_CATALOG_PORT", String.valueOf(getFreePort()));
                 put("WEB_HTTP_CATALOG_PATH", "/catalog");
-                put("EDC_DSP_CALLBACK_ADDRESS", protocolEndpoint.getUrl().toString());
+                put("EDC_DSP_CALLBACK_ADDRESS", controlPlaneProtocol.get().toString());
                 put("EDC_DATASOURCE_DEFAULT_URL", "jdbc:postgresql://localhost:5432/%s".formatted(getId()));
                 put("EDC_DATASOURCE_DEFAULT_USER", "postgres");
                 put("EDC_DATASOURCE_DEFAULT_PASSWORD", "password");
@@ -72,27 +71,26 @@ public class RemoteParticipant extends BaseParticipant {
 
     public Map<String, String> dataPlaneEnv(BaseParticipant participant) {
 
-
         return new HashMap<>() {
             {
                 put("EDC_PARTICIPANT_ID", id);
                 put("EDC_COMPONENT_ID", id);
                 put("EDC_API_AUTH_KEY", API_KEY);
-                put("WEB_HTTP_PORT", String.valueOf(dataPlaneDefault.getPort()));
+                put("WEB_HTTP_PORT", String.valueOf(getFreePort()));
                 put("WEB_HTTP_PATH", "/api");
-                put("WEB_HTTP_VERSION_PORT", String.valueOf(dataPlaneVersion.getPort()));
-                put("WEB_HTTP_VERSION_PATH", dataPlaneVersion.getPath());
-                put("WEB_HTTP_CONTROL_PORT", String.valueOf(dataPlaneControl.getPort()));
-                put("WEB_HTTP_CONTROL_PATH", dataPlaneControl.getPath());
-                put("WEB_HTTP_PUBLIC_PORT", String.valueOf(dataPlanePublic.getPort()));
-                put("WEB_HTTP_PUBLIC_PATH", dataPlanePublic.getPath());
-                put("TX_EDC_DPF_CONSUMER_PROXY_PORT", String.valueOf(consumerPublic.getPort()));
+                put("WEB_HTTP_VERSION_PORT", String.valueOf(dataPlaneVersion.get().getPort()));
+                put("WEB_HTTP_VERSION_PATH", dataPlaneVersion.get().getPath());
+                put("WEB_HTTP_CONTROL_PORT", String.valueOf(dataPlaneControl.get().getPort()));
+                put("WEB_HTTP_CONTROL_PATH", dataPlaneControl.get().getPath());
+                put("WEB_HTTP_PUBLIC_PORT", String.valueOf(dataPlanePublic.get().getPort()));
+                put("WEB_HTTP_PUBLIC_PATH", dataPlanePublic.get().getPath());
+                put("TX_EDC_DPF_CONSUMER_PROXY_PORT", String.valueOf(consumerPublic.get().getPort()));
                 put("EDC_DATASOURCE_DEFAULT_URL", "jdbc:postgresql://localhost:5432/%s".formatted(getId()));
                 put("EDC_DATASOURCE_DEFAULT_USER", "postgres");
                 put("EDC_DATASOURCE_DEFAULT_PASSWORD", "password");
                 put("EDC_TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS", "private-key");
                 put("EDC_TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS", "public-key");
-                put("EDC_DPF_SELECTOR_URL", controlPlaneControl + "/v1/dataplanes");
+                put("EDC_DPF_SELECTOR_URL", controlPlaneControl.get() + "/v1/dataplanes");
                 put("EDC_IAM_STS_OAUTH_TOKEN_URL", sts.toString() + "/token");
                 put("EDC_IAM_STS_OAUTH_CLIENT_ID", getDid());
                 put("EDC_IAM_STS_OAUTH_CLIENT_SECRET_ALIAS", id + "-secret");
@@ -135,11 +133,8 @@ public class RemoteParticipant extends BaseParticipant {
 
         @Override
         public RemoteParticipant build() {
-            var headers = Map.of("x-api-key", API_KEY);
-            super.managementEndpoint(new Endpoint(URI.create("http://localhost:" + getFreePort() + "/api/management"), headers));
-            super.protocolEndpoint(new Endpoint(URI.create("http://localhost:" + getFreePort() + "/protocol")));
-            super.build();
-            return participant;
+            this.participant.enrichManagementRequest = request -> request.header("x-api-key", API_KEY);
+            return super.build();
         }
     }
 }

@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
-import java.net.URI;
+import org.eclipse.edc.spi.system.configuration.Config;
+import org.eclipse.edc.spi.system.configuration.ConfigFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,23 +35,31 @@ public class LocalParticipant extends BaseParticipant {
 
     private final int httpProvisionerPort = getFreePort();
 
-    public Map<String, String> controlPlaneConfiguration() {
-        return new HashMap<>() {
+    public Config controlPlanePostgresConfig() {
+        return controlPlaneConfig().merge(defaultDatasourceConfig());
+    }
+
+    public Config dataPlanePostgresConfig() {
+        return dataPlaneConfig().merge(defaultDatasourceConfig());
+    }
+
+    private Config controlPlaneConfig() {
+        Map<String, String> settings = new HashMap<>() {
             {
                 put(PARTICIPANT_ID, id);
                 put("edc.api.auth.key", API_KEY);
-                put("web.http.port", String.valueOf(controlPlaneDefault.getPort()));
+                put("web.http.port", String.valueOf(getFreePort()));
                 put("web.http.path", "/api");
-                put("web.http.protocol.port", String.valueOf(protocolEndpoint.getUrl().getPort()));
-                put("web.http.protocol.path", protocolEndpoint.getUrl().getPath());
-                put("web.http.management.port", String.valueOf(managementEndpoint.getUrl().getPort()));
-                put("web.http.management.path", managementEndpoint.getUrl().getPath());
-                put("web.http.version.port", String.valueOf(controlPlaneVersion.getPort()));
-                put("web.http.version.path", controlPlaneVersion.getPath());
-                put("web.http.control.port", String.valueOf(controlPlaneControl.getPort()));
-                put("web.http.control.path", controlPlaneControl.getPath());
-                put("edc.dsp.callback.address", protocolEndpoint.getUrl().toString());
-                put("edc.transfer.proxy.endpoint", dataPlanePublic.toString());
+                put("web.http.protocol.port", String.valueOf(controlPlaneProtocol.get().getPort()));
+                put("web.http.protocol.path", controlPlaneProtocol.get().getPath());
+                put("web.http.management.port", String.valueOf(controlPlaneManagement.get().getPort()));
+                put("web.http.management.path", controlPlaneManagement.get().getPath());
+                put("web.http.version.port", String.valueOf(controlPlaneVersion.get().getPort()));
+                put("web.http.version.path", controlPlaneVersion.get().getPath());
+                put("web.http.control.port", String.valueOf(controlPlaneControl.get().getPort()));
+                put("web.http.control.path", controlPlaneControl.get().getPath());
+                put("edc.dsp.callback.address", controlPlaneProtocol.get().toString());
+                put("edc.transfer.proxy.endpoint", dataPlanePublic.get().toString());
                 put("edc.transfer.send.retry.limit", "1");
                 put("edc.transfer.send.retry.base-delay.ms", "100");
                 put("edc.negotiation.consumer.send.retry.limit", "1");
@@ -70,33 +80,28 @@ public class LocalParticipant extends BaseParticipant {
                 put("edc.iam.issuer.id", getDid());
                 put("edc.iam.did.web.use.https", "false");
                 put("edc.iam.trusted-issuer.issuer.id", trustedIssuer);
-
             }
         };
+
+        return ConfigFactory.fromMap(settings);
     }
 
-    public Map<String, String> controlPlanePostgresConfiguration() {
-        var baseConfiguration = controlPlaneConfiguration();
-        baseConfiguration.putAll(defaultDatasourceConfiguration(getName()));
-        return baseConfiguration;
-    }
-
-    public Map<String, String> dataPlaneConfiguration() {
-        return new HashMap<>() {
+    private Config dataPlaneConfig() {
+        Map<String, String> settings = new HashMap<>() {
             {
-                put("web.http.port", String.valueOf(dataPlaneDefault.getPort()));
+                put("web.http.port", String.valueOf(getFreePort()));
                 put("web.http.path", "/api");
-                put("web.http.public.port", String.valueOf(dataPlanePublic.getPort()));
-                put("web.http.public.path", "/public");
-                put("web.http.control.port", String.valueOf(dataPlaneControl.getPort()));
-                put("web.http.control.path", dataPlaneControl.getPath());
-                put("edc.dataplane.api.public.baseurl", dataPlanePublic + "/v2/");
-                put("edc.dataplane.token.validation.endpoint", controlPlaneControl + "/token");
+                put("web.http.public.port", String.valueOf(dataPlanePublic.get().getPort()));
+                put("web.http.public.path", dataPlanePublic.get().getPath());
+                put("web.http.control.port", String.valueOf(dataPlaneControl.get().getPort()));
+                put("web.http.control.path", dataPlaneControl.get().getPath());
+                put("edc.dataplane.api.public.baseurl", dataPlanePublic.get() + "/v2/");
+                put("edc.dataplane.token.validation.endpoint", controlPlaneControl.get() + "/token");
                 put("edc.transfer.proxy.token.signer.privatekey.alias", "private-key");
                 put("edc.transfer.proxy.token.verifier.publickey.alias", "public-key");
                 put("edc.dataplane.http.sink.partition.size", "1");
                 put("edc.dataplane.state-machine.iteration-wait-millis", "50");
-                put("edc.dpf.selector.url", controlPlaneControl + "/v1/dataplanes");
+                put("edc.dpf.selector.url", controlPlaneControl.get() + "/v1/dataplanes");
                 put("edc.component.id", "dataplane");
                 put("edc.iam.sts.oauth.token.url", sts.toString() + "/token");
                 put("edc.iam.sts.oauth.client.id", getDid());
@@ -105,12 +110,12 @@ public class LocalParticipant extends BaseParticipant {
                 put("edc.iam.trusted-issuer.issuer.id", trustedIssuer);
             }
         };
+
+        return ConfigFactory.fromMap(settings);
     }
 
-    public Map<String, String> dataPlanePostgresConfiguration() {
-        var baseConfiguration = dataPlaneConfiguration();
-        baseConfiguration.putAll(defaultDatasourceConfiguration(getName()));
-        return baseConfiguration;
+    private Config defaultDatasourceConfig() {
+        return ConfigFactory.fromMap(defaultDatasourceConfiguration(getName()));
     }
 
     public static class Builder extends BaseParticipant.Builder<LocalParticipant, Builder> {
@@ -125,11 +130,8 @@ public class LocalParticipant extends BaseParticipant {
 
         @Override
         public LocalParticipant build() {
-            var headers = Map.of("x-api-key", API_KEY);
-            super.managementEndpoint(new Endpoint(URI.create("http://localhost:" + getFreePort() + "/api/management"), headers));
-            super.protocolEndpoint(new Endpoint(URI.create("http://localhost:" + getFreePort() + "/protocol")));
-            super.build();
-            return participant;
+            this.participant.enrichManagementRequest = request -> request.header("x-api-key", API_KEY);
+            return super.build();
         }
     }
 }

@@ -105,17 +105,20 @@ public class TransferEndToEndTest {
     @Order(1)
     @RegisterExtension
     static final RuntimeExtension LOCAL_CONTROL_PLANE = new RuntimePerClassExtension(
-            Runtimes.CONTROL_PLANE.create("local-control-plane", LOCAL_PARTICIPANT.controlPlanePostgresConfiguration()));
+            Runtimes.CONTROL_PLANE.create("local-control-plane")
+                    .configurationProvider(LOCAL_PARTICIPANT::controlPlanePostgresConfig));
 
     @Order(2)
     @RegisterExtension
     static final RuntimeExtension LOCAL_DATA_PLANE = new RuntimePerClassExtension(
-            Runtimes.DATA_PLANE.create("local-data-plane", LOCAL_PARTICIPANT.dataPlanePostgresConfiguration()));
+            Runtimes.DATA_PLANE.create("local-data-plane")
+                    .configurationProvider(LOCAL_PARTICIPANT::dataPlanePostgresConfig));
 
     @Order(1)
     @RegisterExtension
     static final RuntimeExtension LOCAL_IDENTITY_HUB = new RuntimePerClassExtension(
-            Runtimes.IDENTITY_HUB.create("local-identity-hub", IDENTITY_HUB_PARTICIPANT.getConfiguration()));
+            Runtimes.IDENTITY_HUB.create("local-identity-hub")
+                    .configurationProvider(IDENTITY_HUB_PARTICIPANT::getConfig));
 
     private static final PostgreSQLContainer<?> PG = new PostgreSQLContainer<>("postgres:16.4")
             .withUsername("postgres")
@@ -189,7 +192,6 @@ public class TransferEndToEndTest {
                 .untilAsserted(() -> assertThatThrownBy(() -> consumer.pullData(edr, Map.of("message", msg), body -> assertThat(body).isEqualTo("data"))));
 
         providerDataSource.verify(HttpRequest.request("/source").withMethod("GET"));
-
     }
 
     @ParameterizedTest
