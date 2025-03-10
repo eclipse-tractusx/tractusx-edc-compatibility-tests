@@ -9,7 +9,7 @@ jackson = "2.18.3"
 restAssured = "5.5.1"
 awaitility = "4.3.0"
 httpMockServer = "5.15.0"
-testcontainers = "1.20.5"
+testcontainers = "1.20.6"
 
 [libraries]
 tx-edc-controlplane-postgresql-hashicorp-vault = { module = "org.eclipse.tractusx.edc:edc-controlplane-postgresql-hashicorp-vault", version.ref = "tractusx" }
