@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
+import org.eclipse.edc.spi.system.configuration.Config;
+import org.eclipse.edc.sql.testfixtures.PostgresqlEndToEndExtension;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +36,9 @@ public class RemoteParticipant extends BaseParticipant {
             "contractnegotiation", "policy", "transferprocess", "bpn",
             "policy-monitor", "edr", "dataplane", "accesstokendata", "dataplaneinstance");
 
-    public Map<String, String> controlPlaneEnv(BaseParticipant participant) {
+    public Map<String, String> controlPlaneEnv(BaseParticipant participant, PostgresqlEndToEndExtension postgresql) {
+        var postgresqlConfig = postgresql.configFor(getName());
+
         return new HashMap<>() {
             {
                 put("EDC_PARTICIPANT_ID", id);
@@ -51,9 +56,7 @@ public class RemoteParticipant extends BaseParticipant {
                 put("WEB_HTTP_CATALOG_PORT", String.valueOf(getFreePort()));
                 put("WEB_HTTP_CATALOG_PATH", "/catalog");
                 put("EDC_DSP_CALLBACK_ADDRESS", controlPlaneProtocol.get().toString());
-                put("EDC_DATASOURCE_DEFAULT_URL", "jdbc:postgresql://localhost:5432/%s".formatted(getId()));
-                put("EDC_DATASOURCE_DEFAULT_USER", "postgres");
-                put("EDC_DATASOURCE_DEFAULT_PASSWORD", "password");
+                putAll(datasourceEnvironmentVariables("default", postgresqlConfig));
                 put("EDC_IAM_STS_OAUTH_TOKEN_URL", sts.toString() + "/token");
                 put("EDC_IAM_STS_OAUTH_CLIENT_ID", getDid());
                 put("EDC_IAM_STS_OAUTH_CLIENT_SECRET_ALIAS", id + "-secret");
@@ -64,12 +67,14 @@ public class RemoteParticipant extends BaseParticipant {
                 put("TESTING_EDC_BDRS_1_KEY", participant.getId());
                 put("TESTING_EDC_BDRS_1_VALUE", participant.getDid());
                 put("EDC_IAM_TRUSTED-ISSUER_ISSUER_ID", trustedIssuer);
-                putAll(datasourceConfig());
+
+                putAll(datasourceConfig(postgresqlConfig));
             }
         };
     }
 
-    public Map<String, String> dataPlaneEnv(BaseParticipant participant) {
+    public Map<String, String> dataPlaneEnv(BaseParticipant participant, PostgresqlEndToEndExtension postgresql) {
+        var postgresqlConfig = postgresql.configFor(getName());
 
         return new HashMap<>() {
             {
@@ -85,9 +90,7 @@ public class RemoteParticipant extends BaseParticipant {
                 put("WEB_HTTP_PUBLIC_PORT", String.valueOf(dataPlanePublic.get().getPort()));
                 put("WEB_HTTP_PUBLIC_PATH", dataPlanePublic.get().getPath());
                 put("TX_EDC_DPF_CONSUMER_PROXY_PORT", String.valueOf(consumerPublic.get().getPort()));
-                put("EDC_DATASOURCE_DEFAULT_URL", "jdbc:postgresql://localhost:5432/%s".formatted(getId()));
-                put("EDC_DATASOURCE_DEFAULT_USER", "postgres");
-                put("EDC_DATASOURCE_DEFAULT_PASSWORD", "password");
+                putAll(datasourceEnvironmentVariables("default", postgresqlConfig));
                 put("EDC_TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS", "private-key");
                 put("EDC_TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS", "public-key");
                 put("EDC_DPF_SELECTOR_URL", controlPlaneControl.get() + "/v1/dataplanes");
@@ -105,20 +108,26 @@ public class RemoteParticipant extends BaseParticipant {
                 put("EDC_IAM_ISSUER_ID", getDid());
                 put("EDC_IAM_TRUSTED-ISSUER_ISSUER_ID", trustedIssuer);
 
-                putAll(datasourceConfig());
+                putAll(datasourceConfig(postgresqlConfig));
             }
         };
     }
 
-    private Map<String, String> datasourceConfig() {
+    private Map<String, String> datasourceConfig(Config postgresqlConfig) {
         var config = new HashMap<String, String>();
         datasources.forEach(ds -> {
-            config.put("EDC_DATASOURCE_" + ds.toUpperCase() + "_URL", "jdbc:postgresql://localhost:5432/" + getName());
             config.put("EDC_DATASOURCE_" + ds.toUpperCase() + "_NAME", ds);
-            config.put("EDC_DATASOURCE_" + ds.toUpperCase() + "_USER", "postgres");
-            config.put("EDC_DATASOURCE_" + ds.toUpperCase() + "_PASSWORD", "password");
+            config.putAll(datasourceEnvironmentVariables(ds, postgresqlConfig));
         });
         return config;
+    }
+
+    private Map<String, String> datasourceEnvironmentVariables(String datasourceName, Config postgresqlConfig) {
+        return Map.of(
+                "EDC_DATASOURCE_" + datasourceName.toUpperCase() + "_URL", postgresqlConfig.getString("edc.datasource.default.url"),
+                "EDC_DATASOURCE_" + datasourceName.toUpperCase() + "_USER", postgresqlConfig.getString("edc.datasource.default.user"),
+                "EDC_DATASOURCE_" + datasourceName.toUpperCase() + "_PASSWORD", postgresqlConfig.getString("edc.datasource.default.password")
+        );
     }
 
     public static class Builder extends BaseParticipant.Builder<RemoteParticipant, Builder> {

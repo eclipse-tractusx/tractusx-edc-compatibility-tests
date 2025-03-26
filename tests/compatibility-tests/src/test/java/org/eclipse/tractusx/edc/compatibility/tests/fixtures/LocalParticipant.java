@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.eclipse.edc.boot.BootServicesExtension.PARTICIPANT_ID;
-import static org.eclipse.edc.sql.testfixtures.PostgresqlEndToEndInstance.defaultDatasourceConfiguration;
 import static org.eclipse.edc.util.io.Ports.getFreePort;
 
 public class LocalParticipant extends BaseParticipant {
@@ -35,25 +34,17 @@ public class LocalParticipant extends BaseParticipant {
 
     private final int httpProvisionerPort = getFreePort();
 
-    public Config controlPlanePostgresConfig() {
-        return controlPlaneConfig().merge(defaultDatasourceConfig());
-    }
-
-    public Config dataPlanePostgresConfig() {
-        return dataPlaneConfig().merge(defaultDatasourceConfig());
-    }
-
-    private Config controlPlaneConfig() {
+    public Config controlPlaneConfig() {
         Map<String, String> settings = new HashMap<>() {
             {
                 put(PARTICIPANT_ID, id);
-                put("edc.api.auth.key", API_KEY);
                 put("web.http.port", String.valueOf(getFreePort()));
                 put("web.http.path", "/api");
                 put("web.http.protocol.port", String.valueOf(controlPlaneProtocol.get().getPort()));
                 put("web.http.protocol.path", controlPlaneProtocol.get().getPath());
                 put("web.http.management.port", String.valueOf(controlPlaneManagement.get().getPort()));
                 put("web.http.management.path", controlPlaneManagement.get().getPath());
+                put("web.http.management.auth.key", API_KEY);
                 put("web.http.version.port", String.valueOf(controlPlaneVersion.get().getPort()));
                 put("web.http.version.path", controlPlaneVersion.get().getPath());
                 put("web.http.control.port", String.valueOf(controlPlaneControl.get().getPort()));
@@ -80,13 +71,14 @@ public class LocalParticipant extends BaseParticipant {
                 put("edc.iam.issuer.id", getDid());
                 put("edc.iam.did.web.use.https", "false");
                 put("edc.iam.trusted-issuer.issuer.id", trustedIssuer);
+                put("edc.sql.schema.autocreate", "false");
             }
         };
 
         return ConfigFactory.fromMap(settings);
     }
 
-    private Config dataPlaneConfig() {
+    public Config dataPlaneConfig() {
         Map<String, String> settings = new HashMap<>() {
             {
                 put("web.http.port", String.valueOf(getFreePort()));
@@ -108,14 +100,11 @@ public class LocalParticipant extends BaseParticipant {
                 put("edc.iam.sts.oauth.client.secret.alias", id + "-secret");
                 put("edc.iam.issuer.id", getDid());
                 put("edc.iam.trusted-issuer.issuer.id", trustedIssuer);
+                put("edc.sql.schema.autocreate", "false");
             }
         };
 
         return ConfigFactory.fromMap(settings);
-    }
-
-    private Config defaultDatasourceConfig() {
-        return ConfigFactory.fromMap(defaultDatasourceConfiguration(getName()));
     }
 
     public static class Builder extends BaseParticipant.Builder<LocalParticipant, Builder> {

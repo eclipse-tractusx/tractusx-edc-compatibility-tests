@@ -26,11 +26,10 @@ dependencies {
     testImplementation(libs.edc.lib.cryptocommon)
     testImplementation(libs.edc.lib.jws2020)
     testImplementation(libs.edc.sql.transactionlocal)
-    testImplementation(libs.edc.sts.spi)
+    testImplementation(libs.edc.spi.sts)
     testImplementation(libs.edc.ih.spi.did)
     testImplementation(libs.edc.ih.spi.credentials)
     testImplementation(libs.edc.ih.spi.participant.context)
-    testImplementation(libs.edc.ih.spi.store)
     testImplementation(libs.tx.bdrs.client.spi)
     testImplementation(libs.jakarta.json.api)
     testImplementation(libs.jackson.datatype.jakarta.jsonp)
@@ -42,4 +41,10 @@ dependencies {
     testImplementation(libs.testcontainers.postgres)
     testImplementation(testFixtures(libs.edc.api.management.test.fixtures))
     testImplementation(testFixtures(libs.edc.sql.test.fixtures))
+
+    testCompileOnly(project(":runtimes:snapshot:controlplane-snapshot"))
+    testCompileOnly(project(":runtimes:snapshot:dataplane-snapshot"))
+    testCompileOnly(project(":runtimes:snapshot:identityhub-snapshot"))
+    testCompileOnly(project(":runtimes:stable:controlplane-stable"))
+    testCompileOnly(project(":runtimes:stable:dataplane-stable"))
 }

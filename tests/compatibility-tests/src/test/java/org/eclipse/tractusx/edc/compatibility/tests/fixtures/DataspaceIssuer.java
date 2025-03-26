@@ -77,11 +77,10 @@ public class DataspaceIssuer extends BaseParticipant {
         var rawVc = createJwtVc(vcJson, did);
         return VerifiableCredentialResource.Builder.newInstance()
                 .issuerId(getDid())
-                .participantId(did)
+                .participantContextId(did)
                 .holderId(bpn)
                 .credential(new VerifiableCredentialContainer(rawVc, CredentialFormat.VC1_0_JWT, credential))
                 .build();
-
     }
 
     public VerifiableCredentialResource issueMembershipCredential(String did, String bpn) {
@@ -140,7 +139,6 @@ public class DataspaceIssuer extends BaseParticipant {
                 issueDismantlerCredential(participant.getDid(), participant.getId()),
                 issueFrameworkCredential(participant.getDid(), participant.getId(), "PcfCredential"),
                 issueFrameworkCredential(participant.getDid(), participant.getId(), "DataExchangeGovernanceCredential"));
-
     }
 
     private String signJwt(ECKey privateKey, String issuerId, String subject, String audience, Map<String, Object> claims) {

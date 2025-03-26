@@ -36,7 +36,7 @@ public class IdentityHubParticipant {
 
     protected final LazySupplier<URI> sts = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/api/sts"));
     protected final LazySupplier<URI> accountsApi = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/api/accounts"));
-    protected final LazySupplier<URI> resolutionApi = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/api/resolution"));
+    protected final LazySupplier<URI> credentialsApi = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/api/credentials"));
     protected final LazySupplier<URI> identityApi = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/api/identity"));
     protected final LazySupplier<URI> didApi = new LazySupplier<>(() -> URI.create("http://localhost:" + getFreePort() + "/"));
     protected String id;
@@ -47,8 +47,8 @@ public class IdentityHubParticipant {
 
         settings.put("web.http.port", String.valueOf(getFreePort()));
         settings.put("web.http.path", "/api");
-        settings.put("web.http.presentation.port", String.valueOf(resolutionApi.get().getPort()));
-        settings.put("web.http.presentation.path", resolutionApi.get().getPath());
+        settings.put("web.http.credentials.port", String.valueOf(credentialsApi.get().getPort()));
+        settings.put("web.http.credentials.path", credentialsApi.get().getPath());
         settings.put("web.http.identity.port", String.valueOf(identityApi.get().getPort()));
         settings.put("web.http.identity.path", identityApi.get().getPath());
         settings.put("web.http.sts.port", String.valueOf(sts.get().getPort()));
@@ -76,7 +76,7 @@ public class IdentityHubParticipant {
     }
 
     public URI getResolutionApi() {
-        return resolutionApi.get();
+        return credentialsApi.get();
     }
 
     public String didFor(String participantId) {

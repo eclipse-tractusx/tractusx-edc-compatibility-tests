@@ -27,12 +27,13 @@ import org.eclipse.edc.junit.extensions.RuntimePerClassExtension;
 import org.eclipse.edc.spi.iam.AudienceResolver;
 import org.eclipse.edc.spi.result.Result;
 import org.eclipse.edc.spi.security.Vault;
+import org.eclipse.edc.sql.testfixtures.PostgresqlEndToEndExtension;
 import org.eclipse.tractusx.edc.compatibility.tests.fixtures.BaseParticipant;
 import org.eclipse.tractusx.edc.compatibility.tests.fixtures.DataspaceIssuer;
-import org.eclipse.tractusx.edc.compatibility.tests.fixtures.EdcDockerRuntimes;
 import org.eclipse.tractusx.edc.compatibility.tests.fixtures.IdentityHubParticipant;
 import org.eclipse.tractusx.edc.compatibility.tests.fixtures.LocalParticipant;
 import org.eclipse.tractusx.edc.compatibility.tests.fixtures.RemoteParticipant;
+import org.eclipse.tractusx.edc.compatibility.tests.fixtures.RemoteParticipantExtension;
 import org.eclipse.tractusx.edc.compatibility.tests.fixtures.Runtimes;
 import org.eclipse.tractusx.edc.spi.identity.mapper.BdrsClient;
 import org.jetbrains.annotations.NotNull;
@@ -48,10 +49,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -64,7 +62,6 @@ import static org.eclipse.edc.connector.controlplane.test.system.utils.PolicyFix
 import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.STARTED;
 import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.SUSPENDED;
 import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
-import static org.eclipse.edc.sql.testfixtures.PostgresqlEndToEndInstance.createDatabase;
 import static org.eclipse.edc.util.io.Ports.getFreePort;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipant;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipantContext;
@@ -99,51 +96,54 @@ public class TransferEndToEndTest {
             .trustedIssuer(ISSUER.getDid())
             .build();
 
-    private static final GenericContainer<?> REMOTE_DATA_PLANE = EdcDockerRuntimes.DATA_PLANE.create("dataplane", REMOTE_PARTICIPANT.dataPlaneEnv(LOCAL_PARTICIPANT));
-    private static final GenericContainer<?> REMOTE_CONTROL_PLANE = EdcDockerRuntimes.CONTROL_PLANE.create("controlplane", REMOTE_PARTICIPANT.controlPlaneEnv(LOCAL_PARTICIPANT));
+    private static final Map<String, String> DIDS = Map.of(
+            LOCAL_PARTICIPANT.getId(), LOCAL_PARTICIPANT.getDid(),
+            REMOTE_PARTICIPANT.getId(), REMOTE_PARTICIPANT.getDid()
+    );
+
+    @Order(0)
+    @RegisterExtension
+    static final PostgresqlEndToEndExtension POSTGRESQL = new PostgresqlEndToEndExtension();
 
     @Order(1)
     @RegisterExtension
-    static final RuntimeExtension LOCAL_CONTROL_PLANE = new RuntimePerClassExtension(
-            Runtimes.CONTROL_PLANE.create("local-control-plane")
-                    .configurationProvider(LOCAL_PARTICIPANT::controlPlanePostgresConfig));
+    static final BeforeAllCallback CREATE_DATABASES = context -> {
+        POSTGRESQL.createDatabase(LOCAL_PARTICIPANT.getName());
+        POSTGRESQL.createDatabase(REMOTE_PARTICIPANT.getName());
+    };
 
     @Order(2)
     @RegisterExtension
-    static final RuntimeExtension LOCAL_DATA_PLANE = new RuntimePerClassExtension(
-            Runtimes.DATA_PLANE.create("local-data-plane")
-                    .configurationProvider(LOCAL_PARTICIPANT::dataPlanePostgresConfig));
+    static final RuntimeExtension LOCAL_CONTROL_PLANE = new RuntimePerClassExtension(
+            Runtimes.CONTROL_PLANE.create("local-control-plane")
+                    .configurationProvider(() -> POSTGRESQL.configFor(LOCAL_PARTICIPANT.getName()))
+                    .configurationProvider(LOCAL_PARTICIPANT::controlPlaneConfig)
+                    .registerServiceMock(BdrsClient.class, DIDS::get)
+                    .registerServiceMock(AudienceResolver.class, message -> Result.success(DIDS.get(message.getCounterPartyId())))
+    );
 
-    @Order(1)
+    @Order(2)
     @RegisterExtension
     static final RuntimeExtension LOCAL_IDENTITY_HUB = new RuntimePerClassExtension(
             Runtimes.IDENTITY_HUB.create("local-identity-hub")
                     .configurationProvider(IDENTITY_HUB_PARTICIPANT::getConfig));
 
-    private static final PostgreSQLContainer<?> PG = new PostgreSQLContainer<>("postgres:16.4")
-            .withUsername("postgres")
-            .withPassword("password")
-            .withCreateContainerCmdModifier(cmd -> cmd.withName("postgres"));
-
-    @Order(0)
+    @Order(3)
     @RegisterExtension
-    static final BeforeAllCallback BOOSTRAP = context -> {
-        var dids = Map.of(LOCAL_PARTICIPANT.getId(), LOCAL_PARTICIPANT.getDid(), REMOTE_PARTICIPANT.getId(), REMOTE_PARTICIPANT.getDid());
-        LOCAL_CONTROL_PLANE.registerServiceMock(BdrsClient.class, dids::get);
-        LOCAL_CONTROL_PLANE.registerServiceMock(AudienceResolver.class, message -> Result.success(dids.get(message.getCounterPartyId())));
+    static final RuntimeExtension LOCAL_DATA_PLANE = new RuntimePerClassExtension(
+            Runtimes.DATA_PLANE.create("local-data-plane")
+                    .configurationProvider(() -> POSTGRESQL.configFor(LOCAL_PARTICIPANT.getName()))
+                    .configurationProvider(LOCAL_PARTICIPANT::dataPlaneConfig)
+    );
 
-        PG.setPortBindings(List.of("5432:5432"));
-        PG.start();
-        createDatabase(LOCAL_PARTICIPANT.getName());
-        createDatabase(REMOTE_PARTICIPANT.getName());
-    };
+    @Order(4)
+    @RegisterExtension
+    static final RemoteParticipantExtension REMOTE_PARTICIPANT_EXTENSION = new RemoteParticipantExtension(REMOTE_PARTICIPANT, LOCAL_PARTICIPANT, POSTGRESQL);
 
     private static ClientAndServer providerDataSource;
 
     @BeforeAll
     static void beforeAll() {
-        REMOTE_CONTROL_PLANE.start();
-        REMOTE_DATA_PLANE.start();
         providerDataSource = startClientAndServer(getFreePort());
         configureParticipant(LOCAL_PARTICIPANT, ISSUER, IDENTITY_HUB_PARTICIPANT, LOCAL_IDENTITY_HUB);
         configureParticipant(REMOTE_PARTICIPANT, ISSUER, IDENTITY_HUB_PARTICIPANT, LOCAL_IDENTITY_HUB);
