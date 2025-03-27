@@ -26,7 +26,7 @@ plugins {
 dependencies {
     implementation(libs.edc.ih.spi)
 
-    runtimeOnly(libs.edc.bom.identithub.sts)
+    runtimeOnly(libs.edc.bom.identityhub)
 
 }
 
