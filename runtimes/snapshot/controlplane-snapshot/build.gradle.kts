@@ -29,8 +29,10 @@ dependencies {
         exclude(group = "org.eclipse.edc", "federated-catalog-api")
         exclude(group = "org.eclipse.tractusx.edc", module = "bdrs-client")
         exclude(group = "org.eclipse.tractusx.edc", module = "federated-catalog")
+        exclude(group = "org.eclipse.tractusx.edc", module = "tx-dcp")
     }
     runtimeOnly(libs.edc.api.management.dataplaneselector)
+    runtimeOnly(project(":runtimes:snapshot:tx-dcp"))
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {

@@ -98,7 +98,9 @@ public class TransferEndToEndTest {
 
     private static final Map<String, String> DIDS = Map.of(
             LOCAL_PARTICIPANT.getId(), LOCAL_PARTICIPANT.getDid(),
-            REMOTE_PARTICIPANT.getId(), REMOTE_PARTICIPANT.getDid()
+            REMOTE_PARTICIPANT.getId(), REMOTE_PARTICIPANT.getDid(),
+            LOCAL_PARTICIPANT.getDid(), REMOTE_PARTICIPANT.getDid(),
+            REMOTE_PARTICIPANT.getDid(), REMOTE_PARTICIPANT.getDid()
     );
 
     @Order(0)

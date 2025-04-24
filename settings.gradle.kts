@@ -50,6 +50,7 @@ dependencyResolutionManagement {
 include(":runtimes:snapshot:identityhub-snapshot")
 include(":runtimes:snapshot:controlplane-snapshot")
 include(":runtimes:snapshot:dataplane-snapshot")
+include(":runtimes:snapshot:tx-dcp")
 include(":runtimes:stable:controlplane-stable")
 include(":runtimes:stable:dataplane-stable")
 include(":runtimes:stable:extensions")
