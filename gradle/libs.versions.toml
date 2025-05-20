@@ -2,8 +2,8 @@
 format.version = "1.1"
 
 [versions]
-edc = "0.12.0"
-tractusx = "0.10.0-20250428-SNAPSHOT"
+edc = "0.13.0-20250516-SNAPSHOT"
+tractusx = "0.10.0-20250519-SNAPSHOT"
 awaitility = "4.3.0"
 httpMockServer = "5.15.0"
 jackson = "2.19.0"
@@ -23,12 +23,11 @@ edc-spi-sts = { module = "org.eclipse.edc:sts-spi", version.ref = "edc" }
 edc-sql-test-fixtures = { module = "org.eclipse.edc:sql-test-fixtures", version.ref = "edc" }
 edc-sql-transactionlocal = { module = "org.eclipse.edc:transaction-local", version.ref = "edc" }
 
-## IH for testing
+edc-bom-identityhub = { module = "org.eclipse.edc:identityhub-bom", version.ref = "edc" }
 edc-ih-spi = { module = "org.eclipse.edc:identity-hub-spi", version.ref = "edc" }
 edc-ih-spi-participant-context = { module = "org.eclipse.edc:participant-context-spi", version.ref = "edc" }
 edc-ih-spi-credentials = { module = "org.eclipse.edc:verifiable-credential-spi", version.ref = "edc" }
 edc-ih-spi-did = { module = "org.eclipse.edc:did-spi", version.ref = "edc" }
-edc-ih-api-presentation = { module = "org.eclipse.edc:presentation-api", version.ref = "edc" }
 edc-lib-jws2020 = { module = "org.eclipse.edc:jws2020-lib", version.ref = "edc" }
 
 jakarta-json-api = { module = "jakarta.json:jakarta.json-api", version.ref = "jakarta-json" }
@@ -39,12 +38,6 @@ mockserver-client = { module = "org.mock-server:mockserver-client-java", version
 mockserver-netty = { module = "org.mock-server:mockserver-netty", version.ref = "httpMockServer" }
 testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
 testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
-
-## BOMS
-edc-bom-identityhub = { module = "org.eclipse.edc:identityhub-bom", version.ref = "edc" }
-
-[bundles]
-
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version = "8.3.6" }
