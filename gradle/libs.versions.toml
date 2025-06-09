@@ -2,7 +2,7 @@
 format.version = "1.1"
 
 [versions]
-edc = "0.13.0-20250516-SNAPSHOT"
+edc = "0.14.0-20250607-SNAPSHOT"
 tractusx = "0.10.0-20250602-SNAPSHOT"
 awaitility = "4.3.0"
 httpMockServer = "5.15.0"
