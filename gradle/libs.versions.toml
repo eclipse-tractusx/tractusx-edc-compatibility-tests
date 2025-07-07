@@ -40,5 +40,5 @@ testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.re
 testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
 
 [plugins]
-shadow = { id = "com.gradleup.shadow", version = "8.3.7" }
+shadow = { id = "com.gradleup.shadow", version = "8.3.8" }
 docker = { id = "com.bmuschko.docker-remote-api", version = "9.4.0" }
