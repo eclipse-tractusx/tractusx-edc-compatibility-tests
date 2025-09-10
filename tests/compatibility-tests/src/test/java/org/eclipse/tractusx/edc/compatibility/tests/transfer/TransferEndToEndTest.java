@@ -178,7 +178,8 @@ public class TransferEndToEndTest {
         providerDataSource.when(HttpRequest.request()).respond(HttpResponse.response().withBody("data"));
         var assetId = UUID.randomUUID().toString();
         var sourceDataAddress = httpSourceDataAddress();
-        createResourcesOnProvider(provider, assetId, PolicyFixtures.contractExpiresIn("5s"), sourceDataAddress);
+        // TODO: Add a more sophisticated policy here
+        createResourcesOnProvider(provider, assetId, PolicyFixtures.noConstraintPolicy(), sourceDataAddress);
 
         var transferProcessId = consumer.requestAssetFrom(assetId, provider)
                 .withTransferType("HttpData-PULL")
