@@ -2,8 +2,9 @@
 format.version = "1.1"
 
 [versions]
-edc = "0.14.0-20250719-SNAPSHOT"
-tractusx = "0.11.0-20250721-SNAPSHOT"
+edc = "0.14.0"
+edc-build = "1.0.0"
+tractusx = "0.11.0-RC2"
 awaitility = "4.3.0"
 httpMockServer = "5.15.0"
 jackson = "2.20.0"
@@ -42,3 +43,4 @@ testcontainers-postgres = { module = "org.testcontainers:postgresql", version.re
 [plugins]
 shadow = { id = "com.gradleup.shadow", version = "8.3.8" }
 docker = { id = "com.bmuschko.docker-remote-api", version = "9.4.0" }
+edc-build = { id = "org.eclipse.edc.edc-build", version.ref = "edc-build" }
