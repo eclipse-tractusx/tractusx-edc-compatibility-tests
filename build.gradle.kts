@@ -52,7 +52,7 @@ allprojects {
 
     dependencies {
         constraints {
-            testImplementation("com.networknt:json-schema-validator:1.5.8") {
+            testImplementation("com.networknt:json-schema-validator:1.5.9") {
                 because("There's a conflict between mockserver-netty and identity-hub dependencies for testing, forcing json-schema-validator to 1.5.6 is solving that.")
             }
         }
