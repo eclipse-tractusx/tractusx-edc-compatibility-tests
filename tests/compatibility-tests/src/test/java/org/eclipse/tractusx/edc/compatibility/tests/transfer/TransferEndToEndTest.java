@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.edc.compatibility.tests.transfer;
 
 import jakarta.json.JsonObject;
-import org.eclipse.edc.connector.controlplane.test.system.utils.PolicyFixtures;
 import org.eclipse.edc.junit.annotations.EndToEndTest;
 import org.eclipse.edc.junit.extensions.RuntimeExtension;
 import org.eclipse.edc.junit.extensions.RuntimePerClassExtension;
@@ -65,6 +64,7 @@ import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
 import static org.eclipse.edc.util.io.Ports.getFreePort;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipant;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipantContext;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.PolicyHelperFunctions.contractExpiresIn;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 
@@ -166,8 +166,11 @@ public class TransferEndToEndTest {
         provider.waitForDataPlane();
         providerDataSource.when(HttpRequest.request()).respond(HttpResponse.response().withBody("data"));
         var assetId = UUID.randomUUID().toString();
-        var sourceDataAddress = httpSourceDataAddress();
-        createResourcesOnProvider(provider, assetId, PolicyFixtures.contractExpiresIn("5s"), sourceDataAddress);
+
+        createResourcesOnProvider(provider,
+                assetId,
+                contractExpiresIn("5s"),
+                httpSourceDataAddress());
 
         var transferProcessId = consumer.requestAssetFrom(assetId, provider)
                 .withTransferType("HttpData-PULL")
@@ -202,7 +205,10 @@ public class TransferEndToEndTest {
         provider.waitForDataPlane();
         providerDataSource.when(HttpRequest.request()).respond(HttpResponse.response().withBody("data"));
         var assetId = UUID.randomUUID().toString();
-        createResourcesOnProvider(provider, assetId, PolicyFixtures.noConstraintPolicy(), httpSourceDataAddress());
+        createResourcesOnProvider(provider,
+                assetId,
+                contractExpiresIn("5s"),
+                httpSourceDataAddress());
 
         var transferProcessId = consumer.requestAssetFrom(assetId, provider)
                 .withTransferType("HttpData-PULL")

@@ -41,6 +41,7 @@ dependencies {
     testImplementation(libs.testcontainers.postgres)
     testImplementation(testFixtures(libs.edc.api.management.test.fixtures))
     testImplementation(testFixtures(libs.edc.sql.test.fixtures))
+    testImplementation(libs.tx.edc.core.spi)
 
     testCompileOnly(project(":runtimes:snapshot:controlplane-snapshot"))
     testCompileOnly(project(":runtimes:snapshot:dataplane-snapshot"))
