@@ -14,7 +14,6 @@ testcontainers = "1.21.3"
 [libraries]
 tx-edc-controlplane-postgresql-hashicorp-vault = { module = "org.eclipse.tractusx.edc:edc-controlplane-postgresql-hashicorp-vault", version.ref = "tractusx" }
 tx-edc-dataplane-postgresql-hashicorp-vault = { module = "org.eclipse.tractusx.edc:edc-dataplane-hashicorp-vault", version.ref = "tractusx" }
-tx-edc-core-spi = { module = "org.eclipse.tractusx.edc:core-spi", version.ref = "tractusx" }
 tx-bdrs-client-spi = { module = "org.eclipse.tractusx.edc:bdrs-client-spi", version.ref = "tractusx" }
 edc-junit = { module = "org.eclipse.edc:junit", version.ref = "edc" }
 edc-api-management-test-fixtures = { module = "org.eclipse.edc:management-api-test-fixtures", version.ref = "edc" }
