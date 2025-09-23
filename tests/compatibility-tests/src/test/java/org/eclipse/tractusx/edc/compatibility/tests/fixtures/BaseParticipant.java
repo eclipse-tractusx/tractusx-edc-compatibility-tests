@@ -143,7 +143,7 @@ public abstract class BaseParticipant extends Participant {
         var dataAddressRaw = baseManagementRequest()
                 .contentType(JSON)
                 .when()
-                .get("/v2/edrs/{id}/dataaddress", transferProcessId)
+                .get("/v3/edrs/{id}/dataaddress", transferProcessId)
                 .then()
                 .log().ifError()
                 .statusCode(200)

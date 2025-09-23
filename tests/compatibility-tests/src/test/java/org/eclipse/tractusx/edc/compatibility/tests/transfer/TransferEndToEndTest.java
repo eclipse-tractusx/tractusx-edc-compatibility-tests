@@ -65,6 +65,7 @@ import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
 import static org.eclipse.edc.util.io.Ports.getFreePort;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipant;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipantContext;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.PolicyHelperFunctions.contractExpiresIn;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 @EndToEndTest
@@ -177,9 +178,8 @@ public class TransferEndToEndTest {
         provider.waitForDataPlane();
         providerDataSource.when(HttpRequest.request()).respond(HttpResponse.response().withBody("data"));
         var assetId = UUID.randomUUID().toString();
-        var sourceDataAddress = httpSourceDataAddress();
-        // TODO: Add a more sophisticated policy here
-        createResourcesOnProvider(provider, assetId, PolicyFixtures.noConstraintPolicy(), sourceDataAddress);
+
+        createResourcesOnProvider(provider, assetId, contractExpiresIn("5s"), httpSourceDataAddress());
 
         var transferProcessId = consumer.requestAssetFrom(assetId, provider)
                 .withTransferType("HttpData-PULL")
