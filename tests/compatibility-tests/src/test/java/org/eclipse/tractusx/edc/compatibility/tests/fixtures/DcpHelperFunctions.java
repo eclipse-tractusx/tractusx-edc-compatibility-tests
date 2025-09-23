@@ -53,16 +53,25 @@ public class DcpHelperFunctions {
 
     public static JsonObject membershipSubject(String did, String id) {
         return Json.createObjectBuilder()
-                .add("type", "MembershipCredential")
                 .add("holderIdentifier", id)
                 .add("id", did)
+                .add("memberOf", "Catena-X")
                 .build();
 
     }
 
-    public static JsonObject frameworkAgreementSubject(String did, String id, String type) {
+    public static JsonObject bpnSubject(String did, String id) {
         return Json.createObjectBuilder()
-                .add("type", type)
+                .add("holderIdentifier", id)
+                .add("id", did)
+                .add("bpn", id)
+                .build();
+
+    }
+
+    public static JsonObject frameworkAgreementSubject(String did, String id) {
+        return Json.createObjectBuilder()
+                .add("type", "DataExchangeGovernanceCredential")
                 .add("holderIdentifier", id)
                 .add("contractVersion", "1.0.0")
                 .add("contractTemplate", "https://public.catena-x.org/contracts/traceabilty.v1.pdf")
