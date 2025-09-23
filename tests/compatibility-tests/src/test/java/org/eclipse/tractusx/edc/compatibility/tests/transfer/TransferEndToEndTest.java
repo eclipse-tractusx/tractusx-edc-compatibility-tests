@@ -118,9 +118,21 @@ public class TransferEndToEndTest {
             Runtimes.CONTROL_PLANE.create("local-control-plane")
                     .configurationProvider(() -> POSTGRESQL.configFor(LOCAL_PARTICIPANT.getName()))
                     .configurationProvider(LOCAL_PARTICIPANT::controlPlaneConfig)
-                    .registerServiceMock(BdrsClient.class, DIDS::get)
-                    .registerServiceMock(AudienceResolver.class, message -> Result.success(DIDS.get(message.getCounterPartyId())))
-    );
+                    .registerServiceMock(BdrsClient.class, new BdrsClient() {
+                        @Override
+                        public String resolveDid(String bpn) {
+                            return DIDS.get(bpn);
+                        }
+
+                        @Override
+                        public String resolveBpn(String did) {
+                            return DIDS.entrySet().stream()
+                                    .filter(entry -> entry.getValue().equals(did))
+                                    .findFirst().orElseThrow().getKey();
+                        }
+                    })
+                    .registerServiceMock(AudienceResolver.class, message -> Result
+                            .success(DIDS.get(message.getCounterPartyId()))));
 
     @Order(2)
     @RegisterExtension
