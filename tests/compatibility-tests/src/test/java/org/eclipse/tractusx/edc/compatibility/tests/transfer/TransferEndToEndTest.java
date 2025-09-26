@@ -65,8 +65,8 @@ import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
 import static org.eclipse.edc.util.io.Ports.getFreePort;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipant;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipantContext;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.PolicyHelperFunctions.contractExpiresIn;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-
 
 @EndToEndTest
 public class TransferEndToEndTest {
@@ -118,9 +118,21 @@ public class TransferEndToEndTest {
             Runtimes.CONTROL_PLANE.create("local-control-plane")
                     .configurationProvider(() -> POSTGRESQL.configFor(LOCAL_PARTICIPANT.getName()))
                     .configurationProvider(LOCAL_PARTICIPANT::controlPlaneConfig)
-                    .registerServiceMock(BdrsClient.class, DIDS::get)
-                    .registerServiceMock(AudienceResolver.class, message -> Result.success(DIDS.get(message.getCounterPartyId())))
-    );
+                    .registerServiceMock(BdrsClient.class, new BdrsClient() {
+                        @Override
+                        public String resolveDid(String bpn) {
+                            return DIDS.get(bpn);
+                        }
+
+                        @Override
+                        public String resolveBpn(String did) {
+                            return DIDS.entrySet().stream()
+                                    .filter(entry -> entry.getValue().equals(did))
+                                    .findFirst().orElseThrow().getKey();
+                        }
+                    })
+                    .registerServiceMock(AudienceResolver.class, message -> Result
+                            .success(DIDS.get(message.getCounterPartyId()))));
 
     @Order(2)
     @RegisterExtension
@@ -166,8 +178,8 @@ public class TransferEndToEndTest {
         provider.waitForDataPlane();
         providerDataSource.when(HttpRequest.request()).respond(HttpResponse.response().withBody("data"));
         var assetId = UUID.randomUUID().toString();
-        var sourceDataAddress = httpSourceDataAddress();
-        createResourcesOnProvider(provider, assetId, PolicyFixtures.contractExpiresIn("5s"), sourceDataAddress);
+
+        createResourcesOnProvider(provider, assetId, contractExpiresIn("5s"), httpSourceDataAddress());
 
         var transferProcessId = consumer.requestAssetFrom(assetId, provider)
                 .withTransferType("HttpData-PULL")

@@ -46,9 +46,12 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import static org.eclipse.edc.jsonld.util.JacksonJsonLd.createObjectMapper;
+import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.bpnSubject;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.createVc;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.frameworkAgreementSubject;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.membershipSubject;
+
+
 
 /**
  * Dataspace issuer configurations
@@ -90,6 +93,13 @@ public class DataspaceIssuer extends BaseParticipant {
                 membershipSubject(did, bpn));
     }
 
+    public VerifiableCredentialResource issueBpnCredential(String did, String bpn) {
+        return issueCredential(did, bpn, "BpnCredential", () -> CredentialSubject.Builder.newInstance()
+                .claim("holderIdentifier", bpn)
+                .build(),
+                bpnSubject(did, bpn));
+    }
+
     public VerifiableCredentialResource issueDismantlerCredential(String did, String bpn) {
         return issueCredential(did, bpn, "DismantlerCredential", () -> CredentialSubject.Builder.newInstance()
                         .id(did)
@@ -106,11 +116,11 @@ public class DataspaceIssuer extends BaseParticipant {
                         .build());
     }
 
-    public VerifiableCredentialResource issueFrameworkCredential(String did, String bpn, String credentialType) {
-        return issueCredential(did, bpn, credentialType, () -> CredentialSubject.Builder.newInstance()
+    public VerifiableCredentialResource issueFrameworkCredential(String did, String bpn) {
+        return issueCredential(did, bpn, "DataExchangeGovernanceCredential", () -> CredentialSubject.Builder.newInstance()
                         .claim("holderIdentifier", bpn)
                         .build(),
-                frameworkAgreementSubject(did, bpn, credentialType));
+                frameworkAgreementSubject(did, bpn));
 
     }
 
@@ -136,9 +146,9 @@ public class DataspaceIssuer extends BaseParticipant {
     public List<VerifiableCredentialResource> issueCredentials(BaseParticipant participant) {
         return List.of(
                 issueMembershipCredential(participant.getDid(), participant.getId()),
+                issueBpnCredential(participant.getDid(), participant.getId()),
                 issueDismantlerCredential(participant.getDid(), participant.getId()),
-                issueFrameworkCredential(participant.getDid(), participant.getId(), "PcfCredential"),
-                issueFrameworkCredential(participant.getDid(), participant.getId(), "DataExchangeGovernanceCredential"));
+                issueFrameworkCredential(participant.getDid(), participant.getId()));
     }
 
     private String signJwt(ECKey privateKey, String issuerId, String subject, String audience, Map<String, Object> claims) {
