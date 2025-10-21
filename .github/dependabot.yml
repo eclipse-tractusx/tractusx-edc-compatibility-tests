@@ -39,6 +39,9 @@ updates:
     labels:
       - "dependabot"
       - "java"
+    ignore:
+      - dependency-name: "org.eclipse.tractusx.edc:*"
+      - dependency-name: "org.eclipse.edc:*"
 
   # Docker CP stable
   - package-ecosystem: "docker"
