@@ -14,7 +14,3 @@ tx-bdrs-client-spi = { module = "org.eclipse.tractusx.edc:bdrs-client-spi", vers
 edc-identity-trust-sts-remote-client = { module = "org.eclipse.edc:identity-trust-sts-remote-client", version.ref = "edc" }
 edc-auth-oauth2-client = { module = "org.eclipse.edc:oauth2-client", version.ref = "edc" }
 edc-api-management-dataplaneselector = { module = "org.eclipse.edc:data-plane-selector-api", version.ref = "edc" }
-
-[plugins]
-shadow = { id = "com.gradleup.shadow", version = "8.3.5" }
-docker = { id = "com.bmuschko.docker-remote-api", version = "9.4.0" }
