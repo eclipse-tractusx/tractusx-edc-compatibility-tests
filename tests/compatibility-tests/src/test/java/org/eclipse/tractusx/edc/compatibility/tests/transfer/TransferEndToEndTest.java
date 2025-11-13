@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.edc.compatibility.tests.transfer;
 
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import jakarta.json.JsonObject;
 import org.eclipse.edc.connector.controlplane.test.system.utils.PolicyFixtures;
 import org.eclipse.edc.junit.annotations.EndToEndTest;
@@ -46,15 +47,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.mockserver.integration.ClientAndServer;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
+
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.any;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
@@ -62,11 +67,9 @@ import static org.eclipse.edc.connector.controlplane.test.system.utils.PolicyFix
 import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.STARTED;
 import static org.eclipse.edc.connector.controlplane.transfer.spi.types.TransferProcessStates.SUSPENDED;
 import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
-import static org.eclipse.edc.util.io.Ports.getFreePort;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipant;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.DcpHelperFunctions.configureParticipantContext;
 import static org.eclipse.tractusx.edc.compatibility.tests.fixtures.PolicyHelperFunctions.contractExpiresIn;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 @EndToEndTest
 public class TransferEndToEndTest {
@@ -152,11 +155,13 @@ public class TransferEndToEndTest {
     @RegisterExtension
     static final RemoteParticipantExtension REMOTE_PARTICIPANT_EXTENSION = new RemoteParticipantExtension(REMOTE_PARTICIPANT, LOCAL_PARTICIPANT, POSTGRESQL);
 
-    private static ClientAndServer providerDataSource;
+    @RegisterExtension
+    static WireMockExtension providerDataSource = WireMockExtension.newInstance()
+            .options(wireMockConfig().dynamicPort())
+            .build();
 
     @BeforeAll
     static void beforeAll() {
-        providerDataSource = startClientAndServer(getFreePort());
         configureParticipant(LOCAL_PARTICIPANT, ISSUER, IDENTITY_HUB_PARTICIPANT, LOCAL_IDENTITY_HUB);
         configureParticipant(REMOTE_PARTICIPANT, ISSUER, IDENTITY_HUB_PARTICIPANT, LOCAL_IDENTITY_HUB);
         configureParticipantContext(ISSUER, IDENTITY_HUB_PARTICIPANT, LOCAL_IDENTITY_HUB);
@@ -176,7 +181,7 @@ public class TransferEndToEndTest {
         consumer.setProtocol(protocol);
         provider.setProtocol(protocol);
         provider.waitForDataPlane();
-        providerDataSource.when(HttpRequest.request()).respond(HttpResponse.response().withBody("data"));
+        providerDataSource.stubFor(any(anyUrl()).willReturn(ok("data")));
         var assetId = UUID.randomUUID().toString();
 
         createResourcesOnProvider(provider, assetId, contractExpiresIn("5s"), httpSourceDataAddress());
@@ -203,7 +208,7 @@ public class TransferEndToEndTest {
         await().atMost(consumer.getTimeout())
                 .untilAsserted(() -> assertThatThrownBy(() -> consumer.pullData(edr, Map.of("message", msg), body -> assertThat(body).isEqualTo("data"))));
 
-        providerDataSource.verify(HttpRequest.request("/source").withMethod("GET"));
+        providerDataSource.verify(getRequestedFor(urlEqualTo("/source")));
     }
 
     @ParameterizedTest
@@ -212,7 +217,7 @@ public class TransferEndToEndTest {
         consumer.setProtocol(protocol);
         provider.setProtocol(protocol);
         provider.waitForDataPlane();
-        providerDataSource.when(HttpRequest.request()).respond(HttpResponse.response().withBody("data"));
+        providerDataSource.stubFor(any(anyUrl()).willReturn(ok("data")));
         var assetId = UUID.randomUUID().toString();
         createResourcesOnProvider(provider, assetId, PolicyFixtures.noConstraintPolicy(), httpSourceDataAddress());
 
@@ -244,7 +249,7 @@ public class TransferEndToEndTest {
         var secondMessage = UUID.randomUUID().toString();
         await().atMost(consumer.getTimeout()).untilAsserted(() -> consumer.pullData(secondEdr, Map.of("message", secondMessage), body -> assertThat(body).isEqualTo("data")));
 
-        providerDataSource.verify(HttpRequest.request("/source").withMethod("GET"));
+        providerDataSource.verify(getRequestedFor(urlEqualTo("/source")));
     }
 
     protected void createResourcesOnProvider(BaseParticipant provider, String assetId, JsonObject contractPolicy, Map<String, Object> dataAddressProperties) {
