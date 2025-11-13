@@ -57,7 +57,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -207,7 +207,7 @@ public class TransferEndToEndTest {
         await().atMost(consumer.getTimeout())
                 .untilAsserted(() -> assertThatThrownBy(() -> consumer.pullData(edr, Map.of("message", msg), body -> assertThat(body).isEqualTo("data"))));
 
-        providerDataSource.verify(getRequestedFor(urlEqualTo("/source")));
+        providerDataSource.verify(getRequestedFor(urlPathEqualTo("/source")));
     }
 
     @ParameterizedTest
@@ -248,7 +248,7 @@ public class TransferEndToEndTest {
         var secondMessage = UUID.randomUUID().toString();
         await().atMost(consumer.getTimeout()).untilAsserted(() -> consumer.pullData(secondEdr, Map.of("message", secondMessage), body -> assertThat(body).isEqualTo("data")));
 
-        providerDataSource.verify(getRequestedFor(urlEqualTo("/source")));
+        providerDataSource.verify(getRequestedFor(urlPathEqualTo("/source")));
     }
 
     protected void createResourcesOnProvider(BaseParticipant provider, String assetId, JsonObject contractPolicy, Map<String, Object> dataAddressProperties) {
