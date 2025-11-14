@@ -22,11 +22,11 @@ package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 import com.nimbusds.jose.jwk.JWK;
 import io.restassured.common.mapper.TypeRef;
 import org.assertj.core.api.ThrowingConsumer;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.edc.connector.controlplane.test.system.utils.LazySupplier;
 import org.eclipse.edc.connector.controlplane.test.system.utils.Participant;
 import org.eclipse.edc.security.token.jwt.CryptoConverter;
 import org.eclipse.edc.spi.types.domain.DataAddress;
+import org.testcontainers.shaded.org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.net.URI;
 import java.security.InvalidAlgorithmParameterException;
