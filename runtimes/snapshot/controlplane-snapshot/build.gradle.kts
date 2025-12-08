@@ -33,9 +33,10 @@ dependencies {
     runtimeOnly(libs.edc.api.management.dataplaneselector)
 }
 
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+tasks.shadowJar {
     exclude("**/pom.properties", "**/pom.xml")
     mergeServiceFiles()
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     archiveFileName.set("${project.name}.jar")
 }
 
