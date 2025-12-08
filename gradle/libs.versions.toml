@@ -29,6 +29,7 @@ edc-ih-spi-participant-context = { module = "org.eclipse.edc:participant-context
 edc-ih-spi-credentials = { module = "org.eclipse.edc:verifiable-credential-spi", version.ref = "edc" }
 edc-ih-spi-did = { module = "org.eclipse.edc:did-spi", version.ref = "edc" }
 edc-lib-jws2020 = { module = "org.eclipse.edc:jws2020-lib", version.ref = "edc" }
+edc-iam-mock = { module = "org.eclipse.edc:iam-mock", version.ref = "edc" }
 
 jakarta-json-api = { module = "jakarta.json:jakarta.json-api", version.ref = "jakarta-json" }
 jackson-datatype-jakarta-jsonp = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jakarta-jsonp", version.ref = "jackson" }
