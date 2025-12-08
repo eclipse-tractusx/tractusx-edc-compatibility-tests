@@ -27,6 +27,7 @@ dependencies {
     testImplementation(libs.edc.lib.jws2020)
     testImplementation(libs.edc.sql.transactionlocal)
     testImplementation(libs.edc.spi.sts)
+    testImplementation(libs.edc.iam.mock)
     testImplementation(libs.edc.ih.spi.did)
     testImplementation(libs.edc.ih.spi.credentials)
     testImplementation(libs.edc.ih.spi.participant.context)

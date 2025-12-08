@@ -2,7 +2,7 @@
 format.version = "1.1"
 
 [versions]
-edc = "0.14.1"
+edc = "0.15.0"
 tractusx = "0.12.0-SNAPSHOT"
 awaitility = "4.3.0"
 jackson = "2.20.1"
@@ -22,6 +22,7 @@ edc-lib-cryptocommon = { module = "org.eclipse.edc:crypto-common-lib", version.r
 edc-spi-sts = { module = "org.eclipse.edc:sts-spi", version.ref = "edc" }
 edc-sql-test-fixtures = { module = "org.eclipse.edc:sql-test-fixtures", version.ref = "edc" }
 edc-sql-transactionlocal = { module = "org.eclipse.edc:transaction-local", version.ref = "edc" }
+edc-iam-mock = { module = "org.eclipse.edc:iam-mock", version.ref = "edc" }
 
 edc-bom-identityhub = { module = "org.eclipse.edc:identityhub-bom", version.ref = "edc" }
 edc-ih-spi = { module = "org.eclipse.edc:identity-hub-spi", version.ref = "edc" }

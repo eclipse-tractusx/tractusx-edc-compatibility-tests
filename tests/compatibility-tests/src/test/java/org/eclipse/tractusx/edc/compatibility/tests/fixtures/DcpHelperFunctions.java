@@ -23,8 +23,8 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import org.eclipse.edc.iam.decentralizedclaims.sts.spi.service.StsAccountService;
 import org.eclipse.edc.iam.did.spi.document.Service;
-import org.eclipse.edc.iam.identitytrust.sts.spi.service.StsAccountService;
 import org.eclipse.edc.identityhub.spi.participantcontext.ParticipantContextService;
 import org.eclipse.edc.identityhub.spi.participantcontext.model.KeyDescriptor;
 import org.eclipse.edc.identityhub.spi.participantcontext.model.ParticipantManifest;
@@ -113,7 +113,7 @@ public class DcpHelperFunctions {
         service.setServiceEndpoint(identityHubParticipant.getResolutionApi() + "/v1/participants/" + toBase64(participant.getDid()));
 
         var participantManifest = ParticipantManifest.Builder.newInstance()
-                .participantId(participant.getDid())
+                .participantContextId(participant.getDid())
                 .did(participant.getDid())
                 .key(key)
                 .serviceEndpoint(service)

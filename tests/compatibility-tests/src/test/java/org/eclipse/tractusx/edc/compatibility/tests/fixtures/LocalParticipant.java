@@ -25,7 +25,7 @@ import org.eclipse.edc.spi.system.configuration.ConfigFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.eclipse.edc.boot.BootServicesExtension.PARTICIPANT_ID;
+import static org.eclipse.edc.iam.mock.IamMockExtension.PARTICIPANT_ID;
 import static org.eclipse.edc.util.io.Ports.getFreePort;
 
 public class LocalParticipant extends BaseParticipant {
