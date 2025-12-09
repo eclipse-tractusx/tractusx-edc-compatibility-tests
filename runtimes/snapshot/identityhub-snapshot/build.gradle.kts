@@ -27,11 +27,10 @@ dependencies {
     implementation(libs.edc.ih.spi)
 
     runtimeOnly(libs.edc.bom.identityhub)
-
+    runtimeOnly(libs.tx.single.participant.vault)
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    exclude("**/pom.properties", "**/pom.xml")
     mergeServiceFiles()
     archiveFileName.set("${project.name}.jar")
 }

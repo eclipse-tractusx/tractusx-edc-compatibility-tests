@@ -36,7 +36,9 @@ dependencies {
     testImplementation(libs.jackson.datatype.jakarta.jsonp)
     testImplementation(libs.restAssured)
     testImplementation(libs.awaitility)
-    testImplementation(libs.wiremock)
+    testImplementation(libs.wiremock) {
+        exclude("com.networknt", "json-schema-validator")
+    }
     testImplementation(libs.testcontainers.junit)
     testImplementation(libs.testcontainers.postgres)
     testImplementation(testFixtures(libs.edc.api.management.test.fixtures))

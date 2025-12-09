@@ -15,6 +15,7 @@ wiremock = "3.13.2"
 tx-edc-controlplane-postgresql-hashicorp-vault = { module = "org.eclipse.tractusx.edc:edc-controlplane-postgresql-hashicorp-vault", version.ref = "tractusx" }
 tx-edc-dataplane-postgresql-hashicorp-vault = { module = "org.eclipse.tractusx.edc:edc-dataplane-hashicorp-vault", version.ref = "tractusx" }
 tx-bdrs-client-spi = { module = "org.eclipse.tractusx.edc:bdrs-client-spi", version.ref = "tractusx" }
+tx-single-participant-vault = { module = "org.eclipse.tractusx.edc:single-participant-vault", version.ref = "tractusx" }
 edc-junit = { module = "org.eclipse.edc:junit", version.ref = "edc" }
 edc-api-management-test-fixtures = { module = "org.eclipse.edc:management-api-test-fixtures", version.ref = "edc" }
 edc-api-management-dataplaneselector = { module = "org.eclipse.edc:data-plane-selector-api", version.ref = "edc" }
