@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.edc.compatibility.tests.fixtures;
 
-import org.eclipse.edc.connector.controlplane.test.system.utils.LazySupplier;
+import org.eclipse.edc.junit.utils.LazySupplier;
 import org.eclipse.edc.spi.system.configuration.Config;
 import org.eclipse.edc.spi.system.configuration.ConfigFactory;
 

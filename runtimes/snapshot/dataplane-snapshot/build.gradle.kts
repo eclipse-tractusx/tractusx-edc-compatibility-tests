@@ -27,11 +27,13 @@ dependencies {
     runtimeOnly(libs.tx.edc.dataplane.postgresql.hashicorp.vault) {
         exclude(group = "org.eclipse.edc", "vault-hashicorp")
     }
+
+    runtimeOnly(libs.tx.single.participant.vault)
 }
 
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    exclude("**/pom.properties", "**/pom.xml")
+tasks.shadowJar {
     mergeServiceFiles()
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     archiveFileName.set("${project.name}.jar")
 }
 

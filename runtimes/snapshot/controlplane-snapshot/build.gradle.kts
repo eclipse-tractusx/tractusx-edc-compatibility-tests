@@ -31,11 +31,13 @@ dependencies {
         exclude(group = "org.eclipse.tractusx.edc", module = "federated-catalog")
     }
     runtimeOnly(libs.edc.api.management.dataplaneselector)
+
+    runtimeOnly(libs.tx.single.participant.vault)
 }
 
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    exclude("**/pom.properties", "**/pom.xml")
+tasks.shadowJar {
     mergeServiceFiles()
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     archiveFileName.set("${project.name}.jar")
 }
 

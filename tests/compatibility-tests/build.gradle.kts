@@ -27,6 +27,7 @@ dependencies {
     testImplementation(libs.edc.lib.jws2020)
     testImplementation(libs.edc.sql.transactionlocal)
     testImplementation(libs.edc.spi.sts)
+    testImplementation(libs.edc.iam.mock)
     testImplementation(libs.edc.ih.spi.did)
     testImplementation(libs.edc.ih.spi.credentials)
     testImplementation(libs.edc.ih.spi.participant.context)
@@ -35,7 +36,9 @@ dependencies {
     testImplementation(libs.jackson.datatype.jakarta.jsonp)
     testImplementation(libs.restAssured)
     testImplementation(libs.awaitility)
-    testImplementation(libs.wiremock)
+    testImplementation(libs.wiremock) {
+        exclude("com.networknt", "json-schema-validator")
+    }
     testImplementation(libs.testcontainers.junit)
     testImplementation(libs.testcontainers.postgres)
     testImplementation(testFixtures(libs.edc.api.management.test.fixtures))
