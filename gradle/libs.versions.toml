@@ -8,7 +8,7 @@ awaitility = "4.3.0"
 jackson = "2.20.1"
 jakarta-json = "2.1.3"
 restAssured = "6.0.0"
-testcontainers = "1.21.3"
+testcontainers = "1.21.4"
 wiremock = "3.13.2"
 
 [libraries]
