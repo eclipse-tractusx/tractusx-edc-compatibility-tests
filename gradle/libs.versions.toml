@@ -37,8 +37,8 @@ jackson-datatype-jakarta-jsonp = { module = "com.fasterxml.jackson.datatype:jack
 restAssured = { module = "io.rest-assured:rest-assured", version.ref = "restAssured" }
 awaitility = { module = "org.awaitility:awaitility", version.ref = "awaitility" }
 wiremock = { module = "org.wiremock:wiremock-jetty12", version.ref = "wiremock" }
-testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
-testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+testcontainers-junit = { module = "org.testcontainers:testcontainers-junit-jupiter", version.ref = "testcontainers" }
+testcontainers-postgres = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version = "9.2.2" }
