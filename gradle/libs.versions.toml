@@ -2,13 +2,13 @@
 format.version = "1.1"
 
 [versions]
-edc = "0.15.0"
+edc = "0.15.1"
 tractusx = "0.12.0-SNAPSHOT"
 awaitility = "4.3.0"
 jackson = "2.20.1"
 jakarta-json = "2.1.3"
 restAssured = "6.0.0"
-testcontainers = "1.21.4"
+testcontainers = "2.0.3"
 wiremock = "3.13.2"
 
 [libraries]
@@ -37,8 +37,8 @@ jackson-datatype-jakarta-jsonp = { module = "com.fasterxml.jackson.datatype:jack
 restAssured = { module = "io.rest-assured:rest-assured", version.ref = "restAssured" }
 awaitility = { module = "org.awaitility:awaitility", version.ref = "awaitility" }
 wiremock = { module = "org.wiremock:wiremock-jetty12", version.ref = "wiremock" }
-testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
-testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+testcontainers-junit = { module = "org.testcontainers:testcontainers-junit-jupiter", version.ref = "testcontainers" }
+testcontainers-postgres = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version = "9.2.2" }
