@@ -21,8 +21,8 @@
 name: "Run Compatibility Tests"
 
 on:
-  schedule:
-    - cron: "0 0 * * *" # run at 00:00 UTC
+#  schedule:
+#    - cron: "0 0 * * *" # run at 00:00 UTC
   # run this workflow on pushes on the following branches:
   push:
     branches:
